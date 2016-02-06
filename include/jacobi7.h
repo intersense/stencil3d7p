@@ -1,5 +1,5 @@
 #include <stdio.h>
-void jacobi7(const int nx,const int ny, int nz, float* A0,/*const int timesteps,*/const float* B,const int ldb, float* Anext,const int ldc, float fac) 
+void jacobi7(const int nx,const int ny, const int nz, float* A0, float* Anext, float fac) 
 {
   //float *temp_ptr;
   int i, j, k;   
