@@ -130,7 +130,7 @@ int main(int argc, char* *argv){
     // Run the CPU version
     startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi7(nx, ny, nz, h_dA1, B, ldb, h_dB1, ldc, fac);
+        jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
         tmp = h_dA1;
         h_dA1 = h_dB1;
         h_dB1 = tmp;
