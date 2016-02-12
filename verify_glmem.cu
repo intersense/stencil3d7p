@@ -108,7 +108,7 @@ int main(int argc, char* *argv){
         output = tmp;
     }
     
-    SYNC_DEVICE();
+    //SYNC_DEVICE();
     ASSERT_STATE("Kernel");
     double endTime = rtclock();
     double elapsedTimeG = endTime - startTime;
