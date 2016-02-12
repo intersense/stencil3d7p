@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <cuda_call.h>
+#include <cuda_call1.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <math.h>
@@ -38,7 +38,8 @@ int main(int argc, char* *argv){
     h_dA = (float*) malloc(xyz_byetes);
     h_dB = (float*) malloc(xyz_byetes);
     h_dA1 = (float*) malloc(xyz_byetes);
-    h_dB1 = (float*) malloc(xyz_byetes);
+    h_dB1 = (float*) malloc(xy
+        z_byetes);
 
     // grid data iniatialization   
     // randomly generaed test data
