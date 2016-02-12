@@ -10,6 +10,9 @@ verify-shmem2:
 	nvcc verify_shmem2.cu -o verify-shmem2.o -I./include
 verify-glmem:
 	nvcc verify_glmem.cu -o verify-glmem.o -I./include
+verify-glmem-no-timer:
+	nvcc verify_glmem_no_timer.cu -o verify-glmem.o -I./include
+
 verify-shmem_3d:
 	nvcc verify_shmem_3d.cu -o verify-shmem_3d.o -I./include
 verify-adam:
