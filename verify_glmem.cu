@@ -10,6 +10,14 @@
 #include "include/jacobi7_cuda.h"
 #include "include/jacobi7.h"
 
+// Timer function
+double rtclock(){
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  return (tp.tv_sec + tp.tv_usec*1.0e-6);
+}
+
+
 int main(int argc, char* *argv){
     if(argc != 7) {
         printf("USAGE: %s <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
@@ -90,6 +98,7 @@ int main(int argc, char* *argv){
     float *tmp1;
     float fac = 6.0/(h_dA[0] * h_dA[0]);
 
+    double startTime = rtclock();
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
         jacobi3d_7p_glmem<<<grid, block>>>(input, output, nx, ny, nz, fac);
@@ -99,9 +108,72 @@ int main(int argc, char* *argv){
         output = tmp;
     }
     
+    SYNC_DEVICE();
+    ASSERT_STATE("Kernel");
+    double endTime = rtclock();
+    double elapsedTimeG = endTime - startTime;
+  
+    printf("Elapsed Time:%lf\n", elapsedTimeG);
+    double flops = xyz * 7.0 * timesteps;
+    double gflops = flops / elapsedTimeG / 1e9;
+    printf("(GPU) %lf GFlop/s\n", gflops);
+    
     // Copy the result to main memory
     CHECK_CALL(cudaMemcpy(h_dB, input, xyz_byetes, cudaMemcpyDeviceToHost));
     
+    // Run the CPU version
+    startTime = rtclock();
+    for(int t = 0; t < timesteps; t += 1) {
+        jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
+        tmp1 = h_dA1;
+        h_dA1 = h_dB1;
+        h_dB1 = tmp1;
+    }
+    endTime = rtclock();
+    double elapsedTimeC = endTime - startTime;
+
+    printf("Elapsed Time:%lf\n", elapsedTimeC);
+    flops = xyz * 7.0 * timesteps;
+    gflops = flops / elapsedTimeC / 1e9;
+    printf("(CPU) %lf GFlop/s\n", gflops);
+
+
+    // compare the results btw CPU and GPU version
+    double errorNorm, refNorm, diff;
+    errorNorm = 0.0;
+    refNorm = 0.0;
+    for (; i < xyz; ++i){
+        diff = h_dA1[i] - h_dB[i];
+        errorNorm += diff * diff;
+        refNorm += h_dA1[i] * h_dA1[i];
+        /*if (h_dB[i+nx*(j+ny*k)] != h_dA1[i+nx*(j+ny*k)])
+                   diff = 1;*/
+    }
+    errorNorm = sqrt(errorNorm);
+    refNorm   = sqrt(refNorm);
+
+    printf("Error Norm:%lf\n", errorNorm);
+    printf("Ref Norm:%lf\n", refNorm);
+  
+    if(abs(refNorm) < 1e-7) {
+      printf("Correctness, FAILED\n");
+    }
+    else if((errorNorm / refNorm) > 1e-2) {
+      printf("Correct  ness, FAILED\n");
+    }
+    else {
+      printf("Correctness, PASSED\n");
+    }
+
+    printf("h_dB[%d]:%f\n", 2+ny*(3+nz*4), h_dB[2+ny*(3+nz*4)]);
+    printf("h_dA[%d]:%f\n", 2+ny*(3+nz*4), h_dA[2+ny*(3+nz*4)]);
+    printf("h_dB1[%d]:%f\n", 2+ny*(3+nz*4), h_dB1[2+ny*(3+nz*4)]);
+    printf("h_dA1[%d]:%f\n", 2+ny*(3+nz*4), h_dA1[2+ny*(3+nz*4)]);
+    printf("-----------------------------------\n");
+    printf("h_dB[%d]:%f\n", 3+ny*(4+nz*5), h_dB[3+ny*(4+nz*5)]);
+    printf("h_dA[%d]:%f\n", 3+ny*(4+nz*5), h_dA[3+ny*(4+nz*5)]);
+    printf("h_dB1[%d]:%f\n", 3+ny*(4+nz*5), h_dB1[3+ny*(4+nz*5)]);
+    printf("h_dA1[%d]:%f\n", 3+ny*(4+nz*5), h_dA1[3+ny*(4+nz*5)]);
     // Free buffers
     free(h_dA);
     free(h_dB);
