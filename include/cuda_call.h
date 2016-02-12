@@ -16,7 +16,7 @@ inline void checkCudaCall(cudaError   err,
     }
   }
 
-inline void syncDevice(const char *file,
+/*inline void syncDevice(const char *file,
                        const int   line) {
   //cudaError err = cudaDeviceSynchronize();
   //CUresult err  = cuCtxSynchronize();
@@ -24,7 +24,7 @@ inline void syncDevice(const char *file,
 
   //cudaThreadSynchronize();
     cudaDeviceSynchronize();
-}
+}*/
 
 inline void checkCudaState(const char *errorMessage,
                            const char *file,
