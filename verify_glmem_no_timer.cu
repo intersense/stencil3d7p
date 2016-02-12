@@ -38,8 +38,7 @@ int main(int argc, char* *argv){
     h_dA = (float*) malloc(xyz_byetes);
     h_dB = (float*) malloc(xyz_byetes);
     h_dA1 = (float*) malloc(xyz_byetes);
-    h_dB1 = (float*) malloc(xy
-        z_byetes);
+    h_dB1 = (float*) malloc(xyz_byetes);
 
     // grid data iniatialization   
     // randomly generaed test data
