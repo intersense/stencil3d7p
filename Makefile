@@ -12,7 +12,8 @@ verify-glmem:
 	nvcc verify_glmem.cu -o verify-glmem.o -I./include
 verify-glmem-no-timer:
 	nvcc verify_glmem_no_timer.cu -o verify-glmem.o -I./include
-
+verify-glmem-l1-cache:
+	nvcc verify_glmem_no_timer.cu -Xptas="-dlcm=ca" -o verify-glmem.o -I./include
 verify-shmem_3d:
 	nvcc verify_shmem_3d.cu -o verify-shmem_3d.o -I./include
 verify-adam:
