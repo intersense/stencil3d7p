@@ -17,7 +17,6 @@ double rtclock(){
   return (tp.tv_sec + tp.tv_usec*1.0e-6);
 }
 
-
 int main(int argc, char* *argv){
     if(argc != 7) {
         printf("USAGE: %s <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
@@ -97,9 +96,11 @@ int main(int argc, char* *argv){
     float *tmp;
     float *tmp1;
     float fac = 6.0/(h_dA[0] * h_dA[0]);
-
-    double startTime = rtclock();
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
     // Run the GPU kernel
+    cudaEventRecord(start);
     for(int t = 0; t < timesteps; t += 1) {
         jacobi3d_7p_glmem<<<grid, block>>>(input, output, nx, ny, nz, fac);
         // swap input and output
@@ -107,15 +108,16 @@ int main(int argc, char* *argv){
         input =  output;
         output = tmp;
     }
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float millisconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+
     
-    SYNC_DEVICE();
-    ASSERT_STATE("Kernel");
-    double endTime = rtclock();
-    double elapsedTimeG = endTime - startTime;
   
-    printf("Elapsed Time:%lf\n", elapsedTimeG);
+    printf("Elapsed Time:%lf\n", milliseconds);
     double flops = xyz * 7.0 * timesteps;
-    double gflops = flops / elapsedTimeG / 1e9;
+    double gflops = flops / elapsedTimeG / 1e3;
     printf("(GPU) %lf GFlop/s\n", gflops);
     
     // Copy the result to main memory
