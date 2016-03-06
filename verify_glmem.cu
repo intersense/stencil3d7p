@@ -110,28 +110,28 @@ int main(int argc, char* *argv){
     }
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
-    float millisconds = 0;
+    float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
 
     
   
     printf("Elapsed Time:%lf\n", milliseconds);
     double flops = xyz * 7.0 * timesteps;
-    double gflops = flops / elapsedTimeG / 1e3;
+    double gflops = flops / milliseconds / 1e3;
     printf("(GPU) %lf GFlop/s\n", gflops);
     
     // Copy the result to main memory
     CHECK_CALL(cudaMemcpy(h_dB, input, xyz_byetes, cudaMemcpyDeviceToHost));
     
     // Run the CPU version
-    startTime = rtclock();
+    float startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
         jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
         tmp1 = h_dA1;
         h_dA1 = h_dB1;
         h_dB1 = tmp1;
     }
-    endTime = rtclock();
+    float endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
 
     printf("Elapsed Time:%lf\n", elapsedTimeC);
