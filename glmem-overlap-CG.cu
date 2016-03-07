@@ -132,37 +132,41 @@ int main(int argc, char* *argv){
     const int streaml_in_bytes = (streamSize+1) * nx * ny * sizeof(float);
     const int streaml_out_bytes = streamSize * nx * ny * sizeof(float);
     const int offset_l = (nstreams-1) * streamSize - nx * ny; 
-    checkCuda( cudaMemcpyAsync(d_A[offset_l], h_A[offset_l], streaml_in_bytes, cudaMemcpyHostToDevice, stream[nstreams-1]));
+    checkCuda( cudaMemcpyAsync(&d_A[offset_l], &h_A[offset_l], streaml_in_bytes, cudaMemcpyHostToDevice, stream[nstreams-1]));
         // Run the GPU kernel
+    input = &d_A[offset_l];
+    output = &d_B[offset_l];
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi3d_7p_glmem<<<grid, block, 0, stream[nstreams-1]>>>(d_A[offset_l], d_B[offset_l], nx, ny, streamSize+1, fac);
+        jacobi3d_7p_glmem<<<grid, block, 0, stream[nstreams-1]>>>(input, output, nx, ny, streamSize+1, fac);
         // swap input and output
-        tmp = d_A;
-        d_A =  d_B;
-        d_B = tmp;
+        tmp = input;
+        input =  output;
+        output = tmp;
     }
     if(timesteps%2==0)
-        checkCuda( cudaMemcpyAsync(h_A[offset_l], d_B[offset_l], streaml_out_bytes, cudaMemcpyDeviceToHost, stream[nstreams-1]));
+        checkCuda( cudaMemcpyAsync(&h_A[offset_l], output, streaml_out_bytes, cudaMemcpyDeviceToHost, stream[nstreams-1]));
     else
-        checkCuda( cudaMemcpyAsync(h_A[offset_l], d_A[offset_l], streaml_out_bytes, cudaMemcpyDeviceToHost, stream[nstreams-1]));
+        checkCuda( cudaMemcpyAsync(&h_A[offset_l], input, streaml_out_bytes, cudaMemcpyDeviceToHost, stream[nstreams-1]));
 
     // the middle stream
     for (int i = 1; i < nstreams-1; ++i){ 
         int offset = i * streamSize - nx * ny;
         const int 
-        checkCuda( cudaMemcpyAsync(d_A[offset], h_A[offset], streamBytes, cudaMemcpyHostToDevice, stream[i]));
+        checkCuda( cudaMemcpyAsync(&d_A[offset], &h_A[offset], streamBytes, cudaMemcpyHostToDevice, stream[i]));
         // Run the GPU kernel
+        input = &d_A[offset];
+        output = &d_B[offset];
         for(int t = 0; t < timesteps; t += 1) {
-            jacobi3d_7p_glmem<<<grid, block, 0, stream[i]>>>(d_A[offset], d_B[offset], nx, ny, streamSize+2, fac);
+            jacobi3d_7p_glmem<<<grid, block, 0, stream[i]>>>(input, output, nx, ny, streamSize+2, fac);
             // swap input and output
-            tmp = d_A;
-            d_A =  d_B;
-            d_B = tmp;
+            tmp = input;
+            input =  output;
+            output = tmp;
         }
         if(timesteps%2==0)
-            checkCuda( cudaMemcpyAsync(h_A[offset + nx*ny], d_B[offset + nx*ny], streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
+            checkCuda( cudaMemcpyAsync(h_A[offset + nx*ny], output+nx*ny, streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
         else
-            checkCuda(  cudaMemcpyAsync(h_A[offset + nx*ny], d_A[offset + nx*ny], streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
+            checkCuda(  cudaMemcpyAsync(h_A[offset + nx*ny], input + nx*ny, streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
     }
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
