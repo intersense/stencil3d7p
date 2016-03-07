@@ -21,11 +21,11 @@ void initial_data(float *h_A, float *h_B, const int xyz){
     int i = 0;
     for(; i < xyz; i++) {
         h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
-        h_B[i] =  h_dA[i];
+        h_B[i] =  h_A[i];
     }
 }
 
-int main(){
+int main(int argc, char* *argv){
      if(argc != 7) {
         printf("USAGE: %s <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
         return 1;
@@ -38,7 +38,7 @@ int main(){
     const int ty = atoi(argv[5]);
     const int timesteps = atoi(argv[6]);
     
-
+    int devId = 0;
     cudaDeviceProp prop;
     checkCuda( cudaGetDeviceProperties(&prop, devId));
     printf("Device : %s\n", prop.name);
@@ -49,7 +49,7 @@ int main(){
     const int xyz_bytes = xyz * sizeof(float);
     
     const int nstreams = 4;
-    const int streamSize = nz/nstream; // sliced along z dimension
+    const int streamSize = nz/nstreams; // sliced along z dimension
     const int streamBytes = (streamSize+2) * nx * ny * sizeof(float);
 
     float *h_A;
@@ -97,10 +97,10 @@ int main(){
         input =  output;
         output = tmp;
     }
-    if(t%2==0)
-        checkCuda( cudaMemcpy(h_A, output, cudaMemcpyDeviceToHost));
+    if(timesteps%2==0)
+        checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
     else
-        checkCuda( cudaMemcpy(h_A, input, cudaMemcpyDeviceToHost));
+        checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
@@ -114,7 +114,7 @@ int main(){
     // the first stream
     const int stream0_in_bytes = (streamSize+1) * nx * ny * sizeof(float);
     const int stream0_out_bytes = streamSize * nx * ny * sizeof(float);
-    checkCuda( cudaMemcpyAsync(&d_A, &h_A, stream0_in_bytes, cudaMemcpyHostToDevice, stream[0]);
+    checkCuda( cudaMemcpyAsync(&d_A, &h_A, stream0_in_bytes, cudaMemcpyHostToDevice, stream[0]));
         // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
         jacobi3d_7p_glmem<<<grid, block, 0, stream[0]>>>(d_A, d_B, nx, ny, streamSize+1, fac);
@@ -123,7 +123,7 @@ int main(){
         d_A =  d_B;
         d_B = tmp;
     }
-    if(t%2==0)
+    if(timesteps%2==0)
         checkCuda( cudaMemcpyAsync(h_A, d_B, stream0_out_bytes, cudaMemcpyDeviceToHost));
     else
         checkCuda( cudaMemcpyAsync(h_A, d_A, stream0_out_bytes, cudaMemcpyDeviceToHost));
@@ -132,7 +132,7 @@ int main(){
     const int streaml_in_bytes = (streamSize+1) * nx * ny * sizeof(float);
     const int streaml_out_bytes = streamSize * nx * ny * sizeof(float);
     const int offset_l = (nStreams-1) * streamSize - nx * ny; 
-    checkCuda( cudaMemcpyAsync(&d_A[offset_l], &h_A[offset_l], streaml_in_bytes, cudaMemcpyHostToDevice, stream[nstreams-1]);
+    checkCuda( cudaMemcpyAsync(&d_A[offset_l], &h_A[offset_l], streaml_in_bytes, cudaMemcpyHostToDevice, stream[nstreams-1]));
         // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
         jacobi3d_7p_glmem<<<grid, block, 0, stream[nstreams-1]>>>(&d_A[offset_l], &d_B[offset_l], nx, ny, streamSize+1, fac);
@@ -141,7 +141,7 @@ int main(){
         d_A =  d_B;
         d_B = tmp;
     }
-    if(t%2==0)
+    if(timesteps%2==0)
         checkCuda( cudaMemcpyAsync(&h_A[offset_l], &d_B[offset_l], streaml_out_bytes, cudaMemcpyDeviceToHost, stream[nstreams-1]));
     else
         checkCuda( cudaMemcpyAsync(&h_A[offset_l], &d_A[offset_l], streaml_out_bytes, cudaMemcpyDeviceToHost, stream[nstreams-1]));
@@ -159,7 +159,7 @@ int main(){
             d_A =  d_B;
             d_B = tmp;
         }
-        if(t%2==0)
+        if(timesteps%2==0)
             checkCuda( cudaMemcpyAsync(&h_A[offset + nx*ny], &d_B[offset + nx*ny], streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
         else
             checkCuda(  cudaMemcpyAsync(&h_A[offset + nx*ny], &d_A[offset + nx*ny], streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
@@ -174,7 +174,7 @@ int main(){
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
-    checkcuda(cudaEventDestroy(dummyEvent));
+    checkCuda(cudaEventDestroy(dummyEvent));
     for (int i=0; i < nStreams; ++i)
         checkcuda( cudaStreamDestroy(stream[i]));
     cudaFree(d_A);
