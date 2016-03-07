@@ -164,9 +164,9 @@ int main(int argc, char* *argv){
             output = tmp;
         }
         if(timesteps%2==0)
-            checkCuda( cudaMemcpyAsync(h_A[offset + nx*ny], output+nx*ny, streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
+            checkCuda( cudaMemcpyAsync(&h_A[offset + nx*ny], output+nx*ny, streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
         else
-            checkCuda(  cudaMemcpyAsync(h_A[offset + nx*ny], input + nx*ny, streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
+            checkCuda(  cudaMemcpyAsync(&h_A[offset + nx*ny], input + nx*ny, streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
     }
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
