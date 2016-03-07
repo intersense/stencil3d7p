@@ -160,9 +160,9 @@ int main(){
             d_B = tmp;
         }
         if(t%2==0)
-            checkCuda( cudaMemcpyAsync(&h_A[offset + nx*ny], &d_B[offset + nx*ny], streamsize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]);
+            checkCuda( cudaMemcpyAsync(&h_A[offset + nx*ny], &d_B[offset + nx*ny], streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
         else
-            checkCuda(  cudaMemcpyAsync(&h_A[offset + nx*ny], &d_A[offset + nx*ny], streamsize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]);
+            checkCuda(  cudaMemcpyAsync(&h_A[offset + nx*ny], &d_A[offset + nx*ny], streamSize*nx*ny*sizeof(float), cudaMemcpyDeviceToHost, stream[i]));
     }
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
