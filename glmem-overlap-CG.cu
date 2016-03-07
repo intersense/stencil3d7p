@@ -150,8 +150,7 @@ int main(int argc, char* *argv){
 
     // the middle stream
     for (int i = 1; i < nstreams-1; ++i){ 
-        int offset = i * streamSize - nx * ny;
-        const int 
+        int offset = (i * streamSize - 1) * nx * ny;
         checkCuda( cudaMemcpyAsync(&d_A[offset], &h_A[offset], streamBytes, cudaMemcpyHostToDevice, stream[i]));
         // Run the GPU kernel
         input = &d_A[offset];
