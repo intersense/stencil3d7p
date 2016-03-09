@@ -122,16 +122,25 @@ int main(int argc, char* *argv){
     printf("(GPU) %lf GFlop/s\n", gflops);
     
     // Copy the result to main memory
-    checkCuda(cudaEventRecord(start));
-    if(timesteps%2==0)
+    if(timesteps%2==0){
+        checkCuda(cudaEventRecord(start));
         checkCuda(cudaMemcpy(h_dB, output, xyz_bytes, cudaMemcpyDeviceToHost));
-    else
+        checkCuda(cudaEventRecord(stop));
+        checkCuda(cudaEventSynchronize(stop));
+        checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
+        printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
+        printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
+    }
+    else{
+        checkCuda(cudaEventRecord(start));
         checkCuda(cudaMemcpy(h_dB, input, xyz_bytes, cudaMemcpyDeviceToHost));
-    checkCuda(cudaEventRecord(stop));
-    checkCuda(cudaEventSynchronize(stop));
-    checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
-    printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
-    printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
+        checkCuda(cudaEventRecord(stop));
+        checkCuda(cudaEventSynchronize(stop));
+        checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
+        printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
+        printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
+    }
+    
     
 
     // Run the CPU version
