@@ -137,19 +137,12 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
 
 __global__ void jacobi3d_7p_shmem_adam_reg(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
 {
-  const int bx = blockDim.x;
-  const int by = blockDim.y;
   const int ix = threadIdx.x + blockIdx.x * blockDim.x;
   const int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
-  const int tx = threadIdx.x + 1;
-  const int ty = threadIdx.y + 1;
-
   int CURRENT_G = ix + iy*nx + nx*ny;
   //__syncthreads();
-  //int CURRENT_S = tx + ty*bx;
 
-  //extern __shared__ float s_data[];
 
   float curr;
   float right, left;
