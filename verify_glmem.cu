@@ -62,7 +62,7 @@ int main(int argc, char* *argv){
         h_dA[i] = 1 + (float)rand() / (float)RAND_MAX;
         h_dB[i] =  h_dA[i];
     }
-    printf("Start computing...");   
+    printf("Start computing... \n");   
 
     // Always use device 0
     checkCuda(cudaSetDevice(0));
@@ -90,7 +90,8 @@ int main(int argc, char* *argv){
     checkCuda(cudaEventRecord(stop));
     checkCuda(cudaEventSynchronize(stop));
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
-    printf("Data %dMB transferred H2D time:%f\n", xyz_bytes/1024*1024, milliseconds);
+    printf("Data %dMB transferred H2D time:%f\n", xyz_bytes >> 20, milliseconds);
+    printf("Bandwidth H2D:%f GB/s\n", (xyz_bytes >> 30)/milliseconds);
 
     checkCuda(cudaMemcpy(d_dB, d_dA, xyz_bytes, cudaMemcpyDeviceToDevice));
     
@@ -129,7 +130,8 @@ int main(int argc, char* *argv){
     checkCuda(cudaEventRecord(stop));
     checkCuda(cudaEventSynchronize(stop));
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
-    printf("Data %dMB transferred D2H time:%f\n", xyz_bytes/1024*1024, milliseconds);
+    printf("Data %dMB transferred D2H time:%f\n", xyz_bytes >> 20, milliseconds);
+    printf("Bandwidth D2H:%f GB/s\n", (xyz_bytes >> 30)/milliseconds);
     
 
     // Run the CPU version
