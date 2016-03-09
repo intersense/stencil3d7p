@@ -7,7 +7,6 @@
 #include <math.h>
 #include "getopt.h"
 #include "include/jacobi7_cuda.h"
-#include "include/jacobi7.h"
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
@@ -50,9 +49,6 @@ int main(int argc, char* *argv){
     float *h_dB;
     float *d_dA;
     float *d_dB;
-
-    float *h_dA1;
-    float *h_dB1;
     
     // Allocate host buffers
     checkCuda(cudaMallocHost((void**)&h_dA, xyz_bytes)); // host pinned
@@ -93,7 +89,6 @@ int main(int argc, char* *argv){
     dim3 block(tx, ty);
 
     float *tmp;
-    float *tmp1;
     float fac = 6.0/(h_dA[0] * h_dA[0]);
     cudaEvent_t start, stop;
     checkCuda(cudaEventCreate(&start));
