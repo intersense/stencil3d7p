@@ -78,8 +78,20 @@ int main(int argc, char* *argv){
     checkCuda(cudaMalloc((void**)&d_dA, xyz_bytes));
     checkCuda(cudaMalloc((void**)&d_dB, xyz_bytes));
     
+    cudaEvent_t start, stop;
+    checkCuda(cudaEventCreate(&start));
+    checkCuda(cudaEventCreate(&stop));
+    float milliseconds = 0;
+
+    checkCuda(cudaEventRecord(start));
+    
     // Copy to device
     checkCuda(cudaMemcpy(d_dA, h_dA, xyz_bytes, cudaMemcpyHostToDevice));
+    checkCuda(cudaEventRecord(stop));
+    checkCuda(cudaEventSynchronize(stop));
+    checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
+    printf("Data %dMB transferred H2D time:%f\n", xyz_bytes/1024*1024, milliseconds);
+
     checkCuda(cudaMemcpy(d_dB, d_dA, xyz_bytes, cudaMemcpyDeviceToDevice));
     
     // Setup the kernel
@@ -90,9 +102,7 @@ int main(int argc, char* *argv){
 
     float *tmp;
     float fac = 6.0/(h_dA[0] * h_dA[0]);
-    cudaEvent_t start, stop;
-    checkCuda(cudaEventCreate(&start));
-    checkCuda(cudaEventCreate(&stop));
+
     checkCuda(cudaEventRecord(start));
     for(int t = 0; t < timesteps; t += 1) {
         jacobi3d_7p_glmem<<<grid, block>>>(input, output, nx, ny, nz, fac);
@@ -102,19 +112,26 @@ int main(int argc, char* *argv){
     }
     checkCuda(cudaEventRecord(stop));
     checkCuda(cudaEventSynchronize(stop));
-    float milliseconds = 0;
+    
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
 
-    printf("Elapsed Time:%lf\n", milliseconds);
+    printf("Elapsed Time:%f\n", milliseconds);
     double flops = xyz * 7.0 * timesteps;
     double gflops = flops / milliseconds / 1e3;
     printf("(GPU) %lf GFlop/s\n", gflops);
     
     // Copy the result to main memory
+    checkCuda(cudaEventRecord(start));
     if(timesteps%2==0)
         checkCuda(cudaMemcpy(h_dB, output, xyz_bytes, cudaMemcpyDeviceToHost));
     else
         checkCuda(cudaMemcpy(h_dB, input, xyz_bytes, cudaMemcpyDeviceToHost));
+    checkCuda(cudaEventRecord(stop));
+    checkCuda(cudaEventSynchronize(stop));
+    checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
+    printf("Data %dMB transferred D2H time:%f\n", xyz_bytes/1024*1024, milliseconds);
+    
+
     // Run the CPU version
     /*float startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
@@ -169,6 +186,7 @@ int main(int argc, char* *argv){
     printf("h_dB1[%d]:%f\n", 3+ny*(4+nz*5), h_dB1[3+ny*(4+nz*5)]);
     printf("h_dA1[%d]:%f\n", 3+ny*(4+nz*5), h_dA1[3+ny*(4+nz*5)]);
     */
+    
     // Free buffers
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
