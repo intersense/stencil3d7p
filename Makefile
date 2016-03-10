@@ -13,7 +13,7 @@ verify-glmem:
 verify-glmem-no-timer:
 	nvcc verify_glmem_no_timer.cu -o verify-glmem-no-timer.o -I./include
 verify-glmem-l1-cache:
-	nvcc verify_glmem_no_timer.cu -Xptxas="-dlcm=ca" -o verify-glmem-l1-cache.o -I./include
+	nvcc verify_glmem.cu -Xptxas="-dlcm=ca" -o verify-glmem-l1-cache.o -I./include
 overlap-glmem:
 	nvcc glmem-overlap-CG.cu -o overlap-glmem.o -I./include
 
