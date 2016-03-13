@@ -86,7 +86,7 @@ int main(int argc, char* *argv){
     float *tmp;
 
     // baseline case - sequential transfer and execute
-    /*checkCuda( cudaEventRecord(startEvent,0) );
+    checkCuda( cudaEventRecord(startEvent,0) );
     checkCuda( cudaMemcpy(d_A, h_A, xyz_bytes, cudaMemcpyHostToDevice));
     checkCuda( cudaMemcpy(d_B, d_A, xyz_bytes, cudaMemcpyDeviceToDevice));
 
@@ -107,7 +107,7 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
 
     printf("Time for sequential transfer and execute (ms): %f\n", ms);
-    */
+    
     // aysnchronous version 1: loop over {copy, kernel, copy}
     initial_data(h_A, h_B, xyz);
 
