@@ -17,7 +17,7 @@ verify-glmem-l1-cache:
 overlap-glmem:
 	nvcc glmem-overlap-CG.cu -o overlap-glmem.o -I./include
 overlap-glmem-compare:
-	nvcc glmem-overlap-CG.cu -o overlap-glmem.o -I./include
+	nvcc glmem-overlap-CG.cu -o overlap-glmem-compare.o -I./include
 
 
 verify-shmem_3d:
