@@ -126,7 +126,7 @@ int main(int argc, char* *argv){
 
     printf("Time of shared memory version (pure GPU) (ms): %f\n", ms1);
   
-    double gflop = (xyz * 1e9) * 7.0 * timesteps;
+    double gflop = (xyz * 1e-9) * 7.0 * timesteps;
     double gflop_per_sec = gflop * 1e3 / ms1;
     printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
     double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1;
@@ -145,7 +145,7 @@ int main(int argc, char* *argv){
     printf("Time of shared memory version (ms): %f\n", ms);
     printf("(including data transfer and memory allocation in GPU.)\n");
   
-    gflop = (xyz * 1e9) * 7.0 * timesteps;
+    gflop = (xyz * 1e-9) * 7.0 * timesteps;
     gflop_per_sec = gflop * 1e3 / ms;
     printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
     mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms;
