@@ -84,30 +84,7 @@ int main(int argc, char* *argv){
     for (int i = 0; i < nstreams; ++i)
       checkCuda( cudaStreamCreate(&stream[i]) );
     float *tmp;
-
-    // baseline case - sequential transfer and execute
-    /*checkCuda( cudaEventRecord(startEvent,0) );
-    checkCuda( cudaMemcpy(d_A, h_A, xyz_bytes, cudaMemcpyHostToDevice));
-    checkCuda( cudaMemcpy(d_B, d_A, xyz_bytes, cudaMemcpyDeviceToDevice));
-
-    // Run the GPU kernel
-    for(int t = 0; t < timesteps; t += 1) {
-        jacobi3d_7p_glmem<<<grid, block>>>(input, output, nx, ny, nz, fac);
-        // swap input and output
-        tmp = input;
-        input =  output;
-        output = tmp;
-    }
-    if(timesteps%2==0)
-        checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
-    else
-        checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
-    checkCuda( cudaEventRecord(stopEvent, 0));
-    checkCuda( cudaEventSynchronize(stopEvent));
-    checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
-
-    printf("Time for sequential transfer and execute (ms): %f\n", ms);
-    */
+    
     // aysnchronous version 1: loop over {copy, kernel, copy}
     initial_data(h_A, h_B, xyz);
 
