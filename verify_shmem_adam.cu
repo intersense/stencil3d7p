@@ -126,10 +126,10 @@ int main(int argc, char* *argv){
 
     printf("Time of shared memory version (pure GPU) (ms): %f\n", ms1);
   
-    double flops = xyz * 7.0 * timesteps;
-    double gflops = flops * 1e3 / ms1 / 1e9;
-    printf("(GPU) %lf GFlop/s\n", gflops);
-    double mupdate_per_sec = (xyz * timesteps) / 1e6 / (ms1 * 1e-3);
+    double gflop = (xyz >> 30) * 7.0 * timesteps;
+    double gflop_per_sec = gflop * 1e3 / ms1;
+    printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
+    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1);
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
 
@@ -145,10 +145,10 @@ int main(int argc, char* *argv){
     printf("Time of shared memory version (ms): %f\n", ms);
     printf("(including data transfer and memory allocation in GPU.)\n");
   
-    flops = xyz * 7.0 * timesteps;
-    gflops = flops * 1e3 / ms / 1e9;
-    printf("(GPU) %lf GFlop/s\n", gflops);
-    mupdate_per_sec = (xyz * timesteps) / 1e6 / (ms * 1e-3);
+    double gflop = (xyz >> 30) * 7.0 * timesteps;
+    double gflop_per_sec = gflop * 1e3 / ms;
+    printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
+    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms);
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
 
