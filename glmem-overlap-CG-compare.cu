@@ -60,6 +60,7 @@ int main(int argc, char* *argv){
     // Allocate host buffers
     checkCuda(cudaMallocHost((void**)&h_A, xyz_bytes)); // host pinned
     checkCuda(cudaMallocHost((void**)&h_B, xyz_bytes)); 
+    
     checkCuda(cudaMalloc((void**)&d_A, xyz_bytes)); // device
     checkCuda(cudaMalloc((void**)&d_B, xyz_bytes));
 

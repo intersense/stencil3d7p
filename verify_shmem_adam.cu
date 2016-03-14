@@ -1,22 +1,31 @@
 //jacobi7.cu
 #include <cuda.h>
-#include <cuda_runtime.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <math.h>
-#include "getopt.h"
-#include <cuda_call.h>
 #include <jacobi7_cuda.h>
-#include <jacobi7.h>
 
-// Timer function
-double rtclock(){
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  return (tp.tv_sec + tp.tv_usec*1.0e-6);
+// Convenience function for checking CUDA runtime API results
+// can be wrapped around any runtime API call. No-op in release builds.
+inline
+cudaError_t checkCuda(cudaError_t result)
+{
+#if defined(DEBUG) || defined(_DEBUG)
+  if (result != cudaSuccess) {
+    fprintf(stderr, "CUDA Runtime Error: %s\n", cudaGetErrorString(result));
+    assert(result == cudaSuccess);
+  }
+#endif
+  return result;
 }
 
+void initial_data(float *h_A, float *h_B, const int xyz){
+    // randomly generaed test data
+    srand(time(NULL));
+    int i = 0;
+    for(; i < xyz; i++) {
+        h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
+        h_B[i] =  h_A[i];
+    }
+}
 
 int main(int argc, char* *argv){
     if(argc != 7) {
@@ -34,58 +43,51 @@ int main(int argc, char* *argv){
     const int xyz = nx * ny * nz;
     const int xyz_bytes = xyz * sizeof(float);
 
-    float *h_dA;
-    float *h_dB;
-    float *d_dA;
-    float *d_dB;
+    float *h_A;
+    float *h_B;
+    float *d_A;
+    float *d_B;
 
-    float *h_dA1;
-    float *h_dB1;
+    float *h_A1;
+    float *h_B1;
+    
+    int devId = 0;
+    cudaDeviceProp prop;
+    checkCuda( cudaGetDeviceProperties(&prop, devId));
+    printf("Device : %s\n", prop.name);
+    checkCuda( cudaSetDevice(devId));
     
     // Allocate host buffers
-    h_dA = (float*) malloc(xyz_bytes);
-    h_dB = (float*) malloc(xyz_bytes);
-    h_dA1 = (float*) malloc(xyz_bytes);
-    h_dB1 = (float*) malloc(xyz_bytes);
+    checkCuda(cudaMallocHost((void**)&h_A, xyz_bytes)); // host pinned
+    checkCuda(cudaMallocHost((void**)&h_B, xyz_bytes));
+    
+    // Allocate device buffers
+    checkCuda(cudaMalloc((void**)&d_A, xyz_bytes)); // device
+    checkCuda(cudaMalloc((void**)&d_B, xyz_bytes));
+
 
     // grid data iniatialization   
     // randomly generaed test data
-    srand(time(NULL));
-    
-    for(int i = 0; i < xyz; i++) {
-        h_dA[i] = (float)rand() / (float)RAND_MAX;
-        h_dB[i] =  h_dA[i];
-        h_dA1[i] = h_dA[i];
-        h_dB1[i] = h_dA[i];
-    }
-    printf("Start computing...\n");
-    printf("h_dB[%d]:%f\n", 2+32*(3+32*4), h_dB[2+32*(3+32*4)]);
-    printf("h_dA[%d]:%f\n", 2+32*(3+32*4), h_dA[2+32*(3+32*4)]);
+    initial_data(h_A, h_B, xyz);
 
-    float *B = 0;
-    const int ldb = 0;
-    const int ldc = 0;
-    
+    float fac = 6.0/(h_A[0] * h_A[0]);
 
-    // Always use device 0
-    cudaSetDevice(0);
+    dim3 grid(nx/tx, ny/ty);
+    dim3 block(tx, ty);
+    float* input = d_A;
+    float* output = d_B;
+
+    float ms; // elapsed time in milliseconds
+    printf("Start computing...\n");   
 
     /* set the ratio of cache/shared memory
     cudaFuncCachePreferNone: Default function cache configuration, no preference
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
     cudaFuncCachePreferL1: Prefer larger L1 cache and smaller shared memory
-    */
+    
     CHECK_CALL(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
-
-    // Allocate device buffers
-    CHECK_CALL(cudaMalloc((void**)&d_dA, xyz_bytes));
-    CHECK_CALL(cudaMalloc((void**)&d_dB, xyz_bytes));
-    
-    // Copy to device
-    CHECK_CALL(cudaMemcpy(d_dA, h_dA, xyz_bytes, cudaMemcpyHostToDevice));
-    //CHECK_CALL(cudaMemcpy(d_dB, h_dB, xyz_bytes, cudaMemcpyHostToDevice));
-    //CHECK_CALL(cudaMemcpy(d_dB, d_dA, xyz_bytes, cudaMemcpyDeviceToDevice));
-    
+    */
+   
     // Setup the kernel
 
     dim3 grid(nx/tx, ny/ty);
@@ -93,103 +95,61 @@ int main(int argc, char* *argv){
 
     
     float *tmp;
-    const float fac = 6.0/(h_dA[0] * h_dA[0]);
+    const float fac = 6.0/(h_A[0] * h_A[0]);
     const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
 
-    double startTime = rtclock();
+    // create events and streams
+    cudaEvent_t startEvent, stopEvent;
+    
+    checkCuda( cudaEventCreate(&startEvent) );
+    checkCuda( cudaEventCreate(&stopEvent) );
+    
+    // timing start
+    checkCuda( cudaEventRecord(startEvent,0) );
+
+    // copy data to device
+    checkCuda( cudaMemcpy(d_A, h_A, xyz_bytes, cudaMemcpyHostToDevice));
+    checkCuda( cudaMemcpy(d_B, d_A, xyz_bytes, cudaMemcpyDeviceToDevice));
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
-        
-        jacobi3d_7p_shmem_adam<<<grid, block, sharedMemSize>>>(d_dA, d_dB, nx, ny, nz, fac);
+        jacobi3d_7p_shmem_adam<<<grid, block, sharedMemSize>>>(d_A, d_B, nx, ny, nz, fac);
         // swap input and output
-        tmp = d_dA;
-        d_dA =  d_dB;
-        d_dB = tmp;
+        tmp = d_A;
+        d_A =  d_B;
+        d_B = tmp;
     }
+    if(timesteps%2==0)
+        checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
+    else
+        checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
+    checkCuda( cudaEventRecord(stopEvent, 0));
+    checkCuda( cudaEventSynchronize(stopEvent));
+    checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
     
-    SYNC_DEVICE();
-    ASSERT_STATE("Kernel");
-    double endTime = rtclock();
-    double elapsedTimeG = endTime - startTime;
+    printf("Time of shared memory version (ms): %f\n", ms);
   
-    printf("Elapsed Time:%lf\n", elapsedTimeG);
     double flops = xyz * 7.0 * timesteps;
-    double gflops = flops / elapsedTimeG / 1e9;
+    double gflops = flops * 1e3 / ms / 1e9;
     printf("(GPU) %lf GFlop/s\n", gflops);
+    double mupdate_per_sec = (xyz * timesteps) / 1e6 / (ms * 1e-3);
+    printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
     
     // Copy the result to main memory
     float *resultG;
     if(timesteps % 2){
-        CHECK_CALL(cudaMemcpy(h_dA, d_dA, xyz_bytes, cudaMemcpyDeviceToHost));
+        CHECK_CALL(cudaMemcpy(h_A, d_A, xyz_bytes, cudaMemcpyDeviceToHost));
     }
     else{
-        CHECK_CALL(cudaMemcpy(h_dA, d_dB, xyz_bytes, cudaMemcpyDeviceToHost));
-    }
-    resultG = h_dA;
-    
-    // Run the CPU version
-    startTime = rtclock();
-    for(int t = 0; t < timesteps; t += 1) {
-        jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
-        tmp = h_dA1;
-        h_dA1 = h_dB1;
-        h_dB1 = tmp;
-    }
+        CHECK_CALL(cudaMemcpy(h_A, d_B, xyz_bytes, cudaMemcpyDeviceToHost));
+    } 
 
-    endTime = rtclock();
-    double elapsedTimeC = endTime - startTime;
-
-    float *resultC;
-    if (timesteps % 2)
-        resultC = h_dA1;
-    else
-        resultC = h_dB1;
-
-    printf("Elapsed Time:%lf\n", elapsedTimeC);
-    flops = xyz * 7.0 * timesteps;
-    gflops = flops / elapsedTimeC / 1e9;
-    printf("(CPU) %lf GFlop/s\n", gflops);
-
-
-    // compare the results btw CPU and GPU version
-    double errorNorm, refNorm, diff;
-    errorNorm = 0.0;
-    refNorm = 0.0;
-    for (int i=0; i < xyz; ++i){
-        diff = resultC[i] - resultG[i];
-        errorNorm += diff * diff;
-        refNorm += h_dA1[i] * h_dA1[i];
-        /*if (h_dB[i+nx*(j+ny*k)] != h_dA1[i+nx*(j+ny*k)])
-                   diff = 1;*/
-    }
-    errorNorm = sqrt(errorNorm);
-    refNorm   = sqrt(refNorm);
-
-    printf("Error Norm:%lf\n", errorNorm);
-    printf("Ref Norm:%lf\n", refNorm);
-  
-    if(abs(refNorm) < 1e-7) {
-      printf("Correctness, FAILED\n");
-    }
-    else if((errorNorm / refNorm) > 1e-2) {
-      printf("Correctness, FAILED\n");
-    }
-    else {
-      printf("Correctness, PASSED\n");
-    }
-
-    printf("resultC[%d]:%f\n", 2+ny*(3+nz*4), resultC[2+ny*(3+nz*4)]);
-    printf("resultG[%d]:%f\n", 2+ny*(3+nz*4), resultG[2+ny*(3+nz*4)]);
-    printf("-----------------------------------\n");
-    printf("resultC[%d]:%f\n", 3+ny*(4+nz*5), resultC[3+ny*(4+nz*5)]);
-    printf("resultG[%d]:%f\n", 3+ny*(4+nz*5), resultG[3+ny*(4+nz*5)]);
-
-    // Free buffers
-    free(h_dA);
-    free(h_dB);
-    free(h_dA1);
-    free(h_dB1);
-    CHECK_CALL(cudaFree(d_dA));
-    CHECK_CALL(cudaFree(d_dB));
+    // cleanup
+    checkCuda( cudaEventDestroy(startEvent));
+    checkCuda( cudaEventDestroy(stopEvent));
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFreeHost(h_A);
+    cudaFreeHost(h_B);
+    return 0;
 
 }
