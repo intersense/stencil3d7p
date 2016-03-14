@@ -93,7 +93,7 @@ int main(int argc, char* *argv){
     
     checkCuda( cudaEventCreate(&startEvent) );
     checkCuda( cudaEventCreate(&stopEvent) );
-    checkCuda( cudaEventCreate(&startevent1));
+    checkCuda( cudaEventCreate(&startEvent1));
     checkCuda( cudaEventCreate(&stopEvent1));
 
     // timing start include data transfer and memory allocation
