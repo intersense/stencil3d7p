@@ -116,10 +116,12 @@ int main(int argc, char* *argv){
     
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
 
-    printf("GPU kernel Elapsed Time:%f ms\n", milliseconds);
-    double flops = xyz * 7.0 * timesteps;
-    double gflops = flops / milliseconds / 1e6;
-    printf("(GPU) %lf GFlop/s\n", gflops);
+    printf("GPU kernel Elapsed Time (pure GPU):%f ms\n", milliseconds);
+    double gflop = (xyz * 1e-9) * 7.0 * timesteps;
+    double gflop_per_sec = gflop * 1e3 / milliseconds;
+    printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
+    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / milliseconds;
+    printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
     
     // Copy the result to main memory
     if(timesteps%2==0){
