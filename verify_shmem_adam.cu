@@ -70,8 +70,6 @@ int main(int argc, char* *argv){
 
     dim3 grid(nx/tx, ny/ty);
     dim3 block(tx, ty);
-    float* input = d_A;
-    float* output = d_B;
 
     float ms, ms1; // elapsed time in milliseconds
     printf("Start computing...\n");   
@@ -103,12 +101,15 @@ int main(int argc, char* *argv){
     checkCuda(cudaMalloc((void**)&d_A, xyz_bytes)); // device
     checkCuda(cudaMalloc((void**)&d_B, xyz_bytes));
 
+    float* input = d_A;
+    float* output = d_B;
+    
     // copy data to device
     checkCuda( cudaMemcpy(d_A, h_A, xyz_bytes, cudaMemcpyHostToDevice));
     checkCuda( cudaMemcpy(d_B, d_A, xyz_bytes, cudaMemcpyDeviceToDevice));
     
     // timing start pure gpu computing
-    checkCuda( cudaEventRecord(startevent1, 0));
+    checkCuda( cudaEventRecord(startEvent1, 0));
 
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
