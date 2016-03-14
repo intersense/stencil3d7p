@@ -129,7 +129,7 @@ int main(int argc, char* *argv){
     double gflop = (xyz >> 30) * 7.0 * timesteps;
     double gflop_per_sec = gflop * 1e3 / ms1;
     printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
-    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1);
+    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
 
