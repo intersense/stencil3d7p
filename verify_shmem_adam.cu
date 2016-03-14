@@ -47,9 +47,6 @@ int main(int argc, char* *argv){
     float *h_B;
     float *d_A;
     float *d_B;
-
-    float *h_A1;
-    float *h_B1;
     
     int devId = 0;
     cudaDeviceProp prop;
@@ -70,7 +67,8 @@ int main(int argc, char* *argv){
     // randomly generaed test data
     initial_data(h_A, h_B, xyz);
 
-    float fac = 6.0/(h_A[0] * h_A[0]);
+    const float fac = 6.0/(h_A[0] * h_A[0]);
+    float *tmp;
 
     dim3 grid(nx/tx, ny/ty);
     dim3 block(tx, ty);
@@ -85,17 +83,11 @@ int main(int argc, char* *argv){
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
     cudaFuncCachePreferL1: Prefer larger L1 cache and smaller shared memory
     
-    CHECK_CALL(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
+    checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
     */
-   
-    // Setup the kernel
-
-    dim3 grid(nx/tx, ny/ty);
-    dim3 block(tx, ty);
 
     
-    float *tmp;
-    const float fac = 6.0/(h_A[0] * h_A[0]);
+
     const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
 
     // create events and streams
@@ -110,14 +102,16 @@ int main(int argc, char* *argv){
     // copy data to device
     checkCuda( cudaMemcpy(d_A, h_A, xyz_bytes, cudaMemcpyHostToDevice));
     checkCuda( cudaMemcpy(d_B, d_A, xyz_bytes, cudaMemcpyDeviceToDevice));
+    
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi3d_7p_shmem_adam<<<grid, block, sharedMemSize>>>(d_A, d_B, nx, ny, nz, fac);
+        jacobi3d_7p_shmem_adam<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
         // swap input and output
-        tmp = d_A;
-        d_A =  d_B;
-        d_B = tmp;
+        tmp = input;
+        input =  output;
+        output = tmp;
     }
+
     if(timesteps%2==0)
         checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
     else
@@ -126,22 +120,14 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventSynchronize(stopEvent));
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
     
-    printf("Time of shared memory version (ms): %f\n", ms);
+    printf("Time of shared memory version (including data transfer.)(ms): %f\n", ms);
   
     double flops = xyz * 7.0 * timesteps;
     double gflops = flops * 1e3 / ms / 1e9;
     printf("(GPU) %lf GFlop/s\n", gflops);
     double mupdate_per_sec = (xyz * timesteps) / 1e6 / (ms * 1e-3);
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
-    
-    // Copy the result to main memory
-    float *resultG;
-    if(timesteps % 2){
-        CHECK_CALL(cudaMemcpy(h_A, d_A, xyz_bytes, cudaMemcpyDeviceToHost));
-    }
-    else{
-        CHECK_CALL(cudaMemcpy(h_A, d_B, xyz_bytes, cudaMemcpyDeviceToHost));
-    } 
+
 
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
