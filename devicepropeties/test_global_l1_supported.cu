@@ -1,5 +1,5 @@
 //test_global_l1_supported.cu
-
+#include <stdio.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
 
