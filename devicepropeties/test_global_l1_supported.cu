@@ -28,6 +28,6 @@ int main(){
     if (prop.localL1CacheSupported)
         printf("Local L1 Cache Supported\n");
     else
-        printf("Local L1 Cache Supported\n");
+        printf("Local L1 Cache NOT Supported\n");
     return 0;
     }
