@@ -18,13 +18,16 @@ cudaError_t checkCuda(cudaError_t result)
 }
 
 int main(){
-
     cudaDeviceProp prop;
     checkCuda(cudaGetDeviceProperties(&prop,0));
     if (prop.globalL1CacheSupported)
-        printf("Global L1 Cache Supported");
+        printf("Global L1 Cache Supported\n");
     else
-        printf("Global L1 Cache NOT Supported");
+        printf("Global L1 Cache NOT Supported\n");
 
+    if (prop.localL1CacheSupported)
+        printf("Local L1 Cache Supported\n");
+    else
+        printf("Local L1 Cache Supported\n");
     return 0;
     }
