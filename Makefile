@@ -11,6 +11,9 @@ verify-adam:
 verify-adam-reg:
 	#nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -maxrregcount 16 -o verify-adam-reg.o -I./include
 	nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -o verify-adam-reg.o -I./include
+verify-adam-reg-prefer-L1:
+	#nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -maxrregcount 16 -o verify-adam-reg.o -I./include
+	nvcc verify_shmem_adam_reg_prefer_L1.cu -Xptxas="-v" -o verify-adam-reg-prefer-L1.o -I./include
 
 
 
