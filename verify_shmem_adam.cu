@@ -78,9 +78,9 @@ int main(int argc, char* *argv){
     cudaFuncCachePreferNone: Default function cache configuration, no preference
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
     cudaFuncCachePreferL1: Prefer larger L1 cache and smaller shared memory
-     */
+     
     checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
-   
+   */
 
     
 
