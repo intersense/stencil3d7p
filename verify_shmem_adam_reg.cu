@@ -124,7 +124,7 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventSynchronize(stopEvent1));
     checkCuda( cudaEventElapsedTime(&ms1, startEvent1, stopEvent1));
 
-    printf("Time of shared memory version (pure GPU) (ms): %f\n", ms1);
+    printf("Time of register version (pure GPU) (ms): %f\n", ms1);
   
     double gflop = (xyz * 1e-9) * 7.0 * timesteps;
     double gflop_per_sec = gflop * 1e3 / ms1;
