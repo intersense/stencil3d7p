@@ -72,7 +72,7 @@ int main(int argc, char* *argv){
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
     cudaFuncCachePreferL1: Prefer larger L1 cache and smaller shared memory
     */
-    //checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
+    checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
 
     // Allocate device buffers
     checkCuda(cudaMalloc((void**)&d_dA, xyz_bytes));
