@@ -1,6 +1,6 @@
 verify-glmem:
 	nvcc verify_glmem.cu -o verify-glmem.o -I./include
-verify-glmem:
+verify-glmem-prefer-L1:
 	nvcc verify_glmem_prefer_L1.cu -o verify-glmem-prefer-L1.o -I./include	
 overlap-glmem:
 	nvcc glmem-overlap-CG.cu -o overlap-glmem.o -I./include
