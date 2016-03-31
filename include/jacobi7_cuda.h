@@ -204,6 +204,7 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
     // Load shared memory into registers
     right = s_data[CURRENT_S + 1];
     left  = s_data[CURRENT_S - 1];
+    
     up    = d_in[CURRENT_G - nx];
     down  = d_in[CURRENT_G + nx];
     
