@@ -69,7 +69,7 @@ int main(int argc, char* *argv){
     const float fac = 6.0/(h_A[0] * h_A[0]);
     float *tmp;
 
-    dim3 grid(ceil(nx/tx), ceil(ny/ty);
+    dim3 grid(ceil(nx/tx), ceil(ny/ty));
     dim3 block(tx, ty);
     printf("grid:(%d, %d)",ceil(nx/tx), ceil(ny/ty));
     printf("block:(%d, %d", tx, ty);
