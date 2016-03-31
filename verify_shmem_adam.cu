@@ -1,7 +1,6 @@
 //jacobi7.cu
 #include <cuda.h>
 #include <stdio.h>
-#include <math.h>
 #include <jacobi7_cuda.h>
 
 // Convenience function for checking CUDA runtime API results
@@ -69,9 +68,9 @@ int main(int argc, char* *argv){
     const float fac = 6.0/(h_A[0] * h_A[0]);
     float *tmp;
 
-    dim3 grid(ceil(nx/tx), ceil(ny/ty));
+    dim3 grid((nx+3)/tx, ny/ty);
     dim3 block(tx, ty);
-    printf("grid:(%d, %d)",ceil(nx/tx), ceil(ny/ty));
+    printf("grid:(%d, %d)", grid.x, grid.y);
     printf("block:(%d, %d", tx, ty);
     float ms, ms1; // elapsed time in milliseconds
     printf("Start computing...\n");   
