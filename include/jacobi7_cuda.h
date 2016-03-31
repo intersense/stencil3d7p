@@ -206,12 +206,13 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
     right = s_data[CURRENT_S + 1];
     left  = s_data[CURRENT_S - 1];
 
-    up    = d_in[CURRENT_G - nx];
-    down  = d_in[CURRENT_G + nx];
+    
     
     // Perform computation and write to output grid (excluding edge nodes)
     if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
     {
+      up    = d_in[CURRENT_G - nx];
+      down  = d_in[CURRENT_G + nx];
       temp = right + left + up + down + front + back - curr * fac;
       d_out[CURRENT_G] = temp;
     }
