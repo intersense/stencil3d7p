@@ -174,11 +174,12 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
   right = s_data[CURRENT_S + 1];
   left  = s_data[CURRENT_S - 1];
   
-  up    = d_in[CURRENT_G - nx];
-  down  = d_in[CURRENT_G + nx];
+
 
   if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
   {
+    up    = d_in[CURRENT_G - nx];
+    down  = d_in[CURRENT_G + nx];
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
     //d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] +s_data[CURRENT_S-bx] + s_data[CURRENT_S+bx] +front + back - s_data[CURRENT_S] * fac;
@@ -204,7 +205,7 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
     // Load shared memory into registers
     right = s_data[CURRENT_S + 1];
     left  = s_data[CURRENT_S - 1];
-    
+
     up    = d_in[CURRENT_G - nx];
     down  = d_in[CURRENT_G + nx];
     
