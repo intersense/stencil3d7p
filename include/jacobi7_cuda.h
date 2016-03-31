@@ -143,7 +143,7 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
   const int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
   const int tx = threadIdx.x + 1;
-  const int ty = threadIdx.y + 1;
+  const int ty = threadIdx.y;// + 1;
 
   int CURRENT_G = ix + iy*nx + nx*ny;
   int CURRENT_S = tx + ty*bx;
@@ -174,15 +174,12 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
   right = s_data[CURRENT_S + 1];
   left  = s_data[CURRENT_S - 1];
   
-
-
   if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
   {
     up    = d_in[CURRENT_G - nx];
     down  = d_in[CURRENT_G + nx];
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
-    //d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] +s_data[CURRENT_S-bx] + s_data[CURRENT_S+bx] +front + back - s_data[CURRENT_S] * fac;
   }
 
   for(int k=1; k<nz-2; k++)
@@ -206,8 +203,6 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
     right = s_data[CURRENT_S + 1];
     left  = s_data[CURRENT_S - 1];
 
-    
-    
     // Perform computation and write to output grid (excluding edge nodes)
     if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
     {
