@@ -132,6 +132,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
     if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
     {
       temp = right + left + up + down + front + back - curr * fac;
+      __syncthreads();
       d_out[CURRENT_G] = temp;
       //d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] +s_data[CURRENT_S-bx] + s_data[CURRENT_S+bx] +front + back - s_data[CURRENT_S] * fac;
     }
