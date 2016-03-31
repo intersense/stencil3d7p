@@ -70,7 +70,8 @@ int main(int argc, char* *argv){
 
     dim3 grid(nx/tx, ny/ty);
     dim3 block(tx, ty);
-
+    printf("grid:(%d, %d)",nx/tx, ny/ty);
+    printf("block:(%d, %d", tx, ty);
     float ms, ms1; // elapsed time in milliseconds
     printf("Start computing...\n");   
 
