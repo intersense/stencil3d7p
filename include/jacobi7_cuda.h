@@ -115,18 +115,21 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
     // Load halo region into shared memory
     if(tx == 1 && ix > 0)       s_data[CURRENT_S - 1]  = d_in[CURRENT_G - 1];
     if(tx == bx-2 && ix < nx-1) s_data[CURRENT_S + 1]  = d_in[CURRENT_G + 1];
-    if(ty == 1 && iy > 0)       s_data[CURRENT_S - bx] = d_in[CURRENT_G - nx];
-    if(ty == by-2 && iy < ny-1) s_data[CURRENT_S + bx] = d_in[CURRENT_G + nx];
+    
+    //*******
+    //if(ty == 1 && iy > 0)       s_data[CURRENT_S - bx] = d_in[CURRENT_G - nx];
+    //if(ty == by-2 && iy < ny-1) s_data[CURRENT_S + bx] = d_in[CURRENT_G + nx];
     __syncthreads();
 
     // Load shared memory into registers
     right = s_data[CURRENT_S + 1];
     left  = s_data[CURRENT_S - 1];
-    up    = s_data[CURRENT_S - bx];
-    down  = s_data[CURRENT_S + bx];
-
-    // test nonoverlap between loading shmem and compute
-    //__syncthreads();
+    
+    up = d_in[CURRENT_G+nx];
+    down = d_in[CURRENT_G-nx];
+    //*******
+    //up    = s_data[CURRENT_S - bx];
+    //down  = s_data[CURRENT_S + bx];
     
     // Perform computation and write to output grid (excluding edge nodes)
     if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)

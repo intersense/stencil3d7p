@@ -87,9 +87,10 @@ int main(int argc, char* *argv){
    */
 
     
-
-    const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
-
+    // ****** up and down not in shmem
+    //const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
+    const int sharedMemSize = (block.x + 2) * sizeof(float);
+    
     // create events and streams
     cudaEvent_t startEvent, stopEvent, startEvent1, stopEvent1;
     
