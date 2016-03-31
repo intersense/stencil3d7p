@@ -74,8 +74,8 @@ int main(int argc, char* *argv){
     //dim3 grid(nx/tx, ny/ty);
     dim3 grid((int)grid_x, (int)grid_y);
     dim3 block(tx, ty);
-    printf("grid:(%d, %d)", grid.x, grid.y);
-    printf("block:(%d, %d", tx, ty);
+    printf("grid:(%d, %d)\n", grid.x, grid.y);
+    printf("block:(%d, %d)\n", tx, ty);
     float ms, ms1; // elapsed time in milliseconds
     printf("Start computing...\n");   
 
@@ -117,7 +117,7 @@ int main(int argc, char* *argv){
 
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi3d_7p_shmem_adam<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
+        jacobi3d_7p_shmem_adam_cwe_shmem<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
         // swap input and output
         tmp = input;
         input =  output;
