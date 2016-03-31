@@ -1,3 +1,4 @@
+// only current, west and east in shared memory
 //jacobi7.cu
 #include <cuda.h>
 #include <stdio.h>
@@ -87,8 +88,7 @@ int main(int argc, char* *argv){
    */
 
     
-    // ****** up and down not in shmem
-    const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
+    const int sharedMemSize = (block.x + 2) * sizeof(float); 
 
     // create events and streams
     cudaEvent_t startEvent, stopEvent, startEvent1, stopEvent1;

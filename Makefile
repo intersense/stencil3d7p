@@ -8,6 +8,8 @@ overlap-glmem-compare:
 	nvcc glmem-overlap-CG.cu -o overlap-glmem-compare.o -I./include
 verify-adam:
 	nvcc verify_shmem_adam.cu -Xptxas="-v" -o verify-adam.o -I./include
+verify-adam-cwe-shmem:
+	nvcc verify_shmem_adam_cwe_shmem.cu -Xptxas="-v" -o verify-adam.o -I./include
 verify-adam-reg:
 	#nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -maxrregcount 16 -o verify-adam-reg.o -I./include
 	nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -o verify-adam-reg.o -I./include
