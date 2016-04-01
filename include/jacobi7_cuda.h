@@ -138,7 +138,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
 __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
 {
   const int bx = blockDim.x;
-  const int by = blockDim.y;
+  //const int by = blockDim.y;
   const int ix = threadIdx.x + blockIdx.x * blockDim.x;
   const int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
