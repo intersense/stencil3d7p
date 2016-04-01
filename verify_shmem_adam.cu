@@ -85,7 +85,8 @@ int main(int argc, char* *argv){
      
     checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
    */
-    checkCuda(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
+    // set the shared memory bank size to eight bytes
+    //checkCuda(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
     
     // ****** up and down not in shmem
     const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
