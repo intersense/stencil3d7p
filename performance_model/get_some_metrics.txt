@@ -1,0 +1,1 @@
+nvprof --metrics gld_throughput,gld_transactions_per_request,gst_throughput,gld_efficiency,gst_transactions_per_request,gst_efficiency,global_replay_overhead,shared_load_throughput,achieved_occupancy ./verify-adam.o 256 256 256 32 8 1
