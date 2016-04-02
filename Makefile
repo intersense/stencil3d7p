@@ -11,7 +11,7 @@ overlap-glmem-compare:
 verify-adam:
 	nvcc verify_shmem_adam.cu -Xptxas="-v" -o verify-adam.o -I./include
 verify-adam-no-L1:
-	nvcc verify_shmem_adam.cu -o verify_shmem_adam-no-L1.o -Xptxas -dlcm=cg -I./include 
+	nvcc verify_shmem_adam.cu -o verify-adam-no-L1.o -Xptxas -dlcm=cg -I./include 
 verify-adam-cwe-shmem:
 	nvcc verify_shmem_adam_cwe_shmem.cu -Xptxas="-v" -o verify-adam-cwe-shmem.o -I./include
 verify-adam-reg:
