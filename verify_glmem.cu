@@ -119,7 +119,7 @@ int main(int argc, char* *argv){
 
     checkCuda(cudaEventRecord(start));
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi3d_7p_glmem<<<grid, block>>>(input, output, nx, ny, nz, fac);
+        kernel<<<grid, block>>>(input, output, nx, ny, nz, fac);
         tmp = input;
         input =  output;
         output = tmp;
