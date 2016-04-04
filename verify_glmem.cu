@@ -30,7 +30,7 @@ double rtclock(){
 }
 
 int main(int argc, char* *argv){
-    if(argc != 7) {
+    if(argc != 8) {
         printf("USAGE: %s <0row_or_1col_first> <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
         return 1;
     }
