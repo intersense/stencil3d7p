@@ -31,17 +31,26 @@ double rtclock(){
 
 int main(int argc, char* *argv){
     if(argc != 7) {
-        printf("USAGE: %s <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
+        printf("USAGE: %s <0row_or_1col_first> <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
         return 1;
     }
     // program parameters trans
-    const int nx = atoi(argv[1]);
-    const int ny = atoi(argv[2]);
-    const int nz = atoi(argv[3]);
-    const int tx = atoi(argv[4]);
-    const int ty = atoi(argv[5]);
-    const int timesteps = atoi(argv[6]);
+    const int row_or_col = atoi(argv[1]);
+    const int nx = atoi(argv[2]);
+    const int ny = atoi(argv[3]);
+    const int nz = atoi(argv[4]);
+    const int tx = atoi(argv[5]);
+    const int ty = atoi(argv[6]);
+    const int timesteps = atoi(argv[7]);
     
+    void (*kernel)(float *, float *, const int , const int , const int , float );
+    // the first arg determins the row first or column first
+    // 0: row first; 1: column first
+    if (row_or_col == 0)
+        kernel = &jacobi3d_7p_glmem;
+    if (row_or_col == 1)
+        kernel = &jacobi3d_7p_glmem_col; 
+
     const int xyz = nx * ny * nz;
     const int xyz_bytes = xyz * sizeof(float);
 
@@ -104,7 +113,7 @@ int main(int argc, char* *argv){
     dim3 block(tx, ty);
     printf("grid:(%d, %d)\n", grid.x, grid.y);
     printf("block:(%d, %d)\n", tx, ty);
-    
+
     float *tmp;
     float fac = 6.0/(h_dA[0] * h_dA[0]);
 

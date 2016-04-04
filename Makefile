@@ -2,6 +2,7 @@ verify-glmem:
 	nvcc verify_glmem.cu -o verify-glmem.o -I./include
 verify-glmem-no-L1:
 	nvcc verify_glmem.cu -o verify-glmem-no-L1.o -Xptxas -dlcm=cg -I./include 
+
 verify-glmem-prefer-L1:
 	nvcc verify_glmem_prefer_L1.cu -o verify-glmem-prefer-L1.o -I./include	
 overlap-glmem:
