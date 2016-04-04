@@ -68,11 +68,13 @@ int main(int argc, char* *argv){
 
     const float fac = 6.0/(h_A[0] * h_A[0]);
     float *tmp;
-    float grid_x = ceil(((float)nx)/tx);
-    float grid_y = ceil((float)ny/ty);
-    //dim3 grid(nx/tx, ny/ty);
-    dim3 grid((int)grid_x, (int)grid_y);
+
+    // modify nx/tx and ny/ty to (nx+tx-1)/tx and (ny+ty-1)/ty
+    // inorder to avoid wrong configuration
+    dim3 grid((nx+tx-1)/tx, (ny+ty-1)/ty);
     dim3 block(tx, ty);
+    dim3 block(tx, ty);
+    
     printf("grid:(%d, %d)", grid.x, grid.y);
     printf("block:(%d, %d", tx, ty);
     float ms, ms1; // elapsed time in milliseconds

@@ -98,7 +98,9 @@ int main(int argc, char* *argv){
     // Setup the kernel
     float* input = d_dA;
     float* output = d_dB;
-    dim3 grid(nx/tx, ny/ty);
+    // modify nx/tx and ny/ty to (nx+tx-1)/tx and (ny+ty-1)/ty
+    // inorder to avoid wrong configuration
+    dim3 grid((nx+tx-1)/tx, (ny+ty-1)/ty);
     dim3 block(tx, ty);
 
     float *tmp;
