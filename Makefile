@@ -22,6 +22,9 @@ verify-adam-reg-prefer-L1:
 	nvcc verify_shmem_adam_reg_prefer_L1.cu -Xptxas="-v" -o verify-adam-reg-prefer-L1.o -I./include
 
 
+# test
+func-pointer:
+	nvcc test_func_pointer.cu -o glmem-func-pointer.o -I./include
 
 clean:
 	rm *.o 
