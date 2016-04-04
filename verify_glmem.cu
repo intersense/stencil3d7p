@@ -50,6 +50,8 @@ int main(int argc, char* *argv){
         kernel = &jacobi3d_7p_glmem;
     if (row_or_col == 1)
         kernel = &jacobi3d_7p_glmem_col; 
+    if (row_or_col == 2)
+        kernel = &jacobi3d_7p_glmem_col_row; 
 
     const int xyz = nx * ny * nz;
     const int xyz_bytes = xyz * sizeof(float);
