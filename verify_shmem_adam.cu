@@ -59,9 +59,6 @@ int main(int argc, char* *argv){
     checkCuda(cudaMallocHost((void**)&h_A, xyz_bytes)); // host pinned
     checkCuda(cudaMallocHost((void**)&h_B, xyz_bytes));
     
-
-
-
     // grid data iniatialization   
     // randomly generaed test data
     initial_data(h_A, h_B, xyz);
@@ -74,9 +71,9 @@ int main(int argc, char* *argv){
     dim3 grid((nx+tx-1)/tx, (ny+ty-1)/ty);
     dim3 block(tx, ty);
     dim3 block(tx, ty);
-    
-    printf("grid:(%d, %d)", grid.x, grid.y);
-    printf("block:(%d, %d", tx, ty);
+
+    printf("grid:(%d, %d)\n", grid.x, grid.y);
+    printf("block:(%d, %d)\n", tx, ty);
     float ms, ms1; // elapsed time in milliseconds
     printf("Start computing...\n");   
 
@@ -92,7 +89,7 @@ int main(int argc, char* *argv){
     
     // ****** up and down not in shmem
     const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
-
+    printf("Shared Memory Size: %dKB\n", sharedMemSize>>10);
     // create events and streams
     cudaEvent_t startEvent, stopEvent, startEvent1, stopEvent1;
     

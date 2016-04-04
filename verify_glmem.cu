@@ -102,7 +102,9 @@ int main(int argc, char* *argv){
     // inorder to avoid wrong configuration
     dim3 grid((nx+tx-1)/tx, (ny+ty-1)/ty);
     dim3 block(tx, ty);
-
+    printf("grid:(%d, %d)\n", grid.x, grid.y);
+    printf("block:(%d, %d)\n", tx, ty);
+    
     float *tmp;
     float fac = 6.0/(h_dA[0] * h_dA[0]);
 
