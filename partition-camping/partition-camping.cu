@@ -41,9 +41,10 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
         int index = startIndex + offset;
         // Read from global memory location
         readVal = d_arr[index]+1;
+        d_arr[index] = readVal;
     }
     /* Write once to memory to prevent the above code from being optimized out */
-    d_arr[0] = readVal;
+    //d_arr[0] = readVal;
 }
 
 __global__ void readBenchmark_PC(TYPE *d_arr)
@@ -55,8 +56,9 @@ __global__ void readBenchmark_PC(TYPE *d_arr)
     {
         int index = ((threadIdx.x + x) % elemsInPartition);
         readVal = d_arr[index]+1;
+        d_arr[index] = readVal;
     }
-    d_arr[0] = readVal;
+    //d_arr[0] = readVal;
 }
 
 int main(int argc, char* *argv)
@@ -110,7 +112,7 @@ int main(int argc, char* *argv)
     cudaEvent_t start, stop;
     checkCuda(cudaEventCreate(&start));
     checkCuda(cudaEventCreate(&stop));
-    
+
     checkCuda(cudaEventRecord(start));
     // The kernel
     int t = 0;
