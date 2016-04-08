@@ -91,10 +91,8 @@ int main(int argc, char* *argv)
     int i = 0;
     for(; i < SIZE; i++) {
         a[i] = rand();
-        printf("a[%d]=%d", i, a[i]);
+        //printf("a[%d]=%d", i, a[i]);
     }
-
-    
 
     float milliseconds = 0;
     
