@@ -93,6 +93,7 @@ int main(int argc, char* *argv)
         a[i] = 1 + rand() / RAND_MAX;
     }
 
+    printf("a[2]=%d", a[2]);
 
     float milliseconds = 0;
     
