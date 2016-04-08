@@ -45,6 +45,7 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
     /* Write once to memory to prevent the above code from being optimized out */
     d_arr[0] = readVal;
 }
+
 __global__ void readBenchmark_PC(TYPE *d_arr)
 {
     // size of each partition: 256 bytes
@@ -68,7 +69,8 @@ int main(int argc, char* *argv)
     const int bx = atoi(argv[2]);
     const int by = atoi(argv[3]);
     const int Times = atoi(argv[4]);
-
+    printf("times:%d\n", Times);
+    
     const int data_size = SIZE * sizeof(TYPE);
 
     TYPE *a;
