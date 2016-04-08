@@ -60,13 +60,14 @@ __global__ void readBenchmark_PC(TYPE *d_arr)
 
 int main(int argc, char* *argv)
 {
-        if(argc != 4) {
-        printf("USAGE: %s <kernel_0_noPC_1_PC> <bx> <by>\n", argv[0]);
+        if(argc != 5) {
+        printf("USAGE: %s <kernel_0_noPC_1_PC> <bx> <by> <times>\n", argv[0]);
         return 1;
     }
     const int PC = atoi(argv[1]);
     const int bx = atoi(argv[2]);
     const int by = atoi(argv[3]);
+    const int times = atoi(argv[4]);
 
     const int data_size = SIZE * sizeof(TYPE);
 
@@ -108,7 +109,12 @@ int main(int argc, char* *argv)
     checkCuda(cudaEventCreate(&start));
     
     // The kernel
-    kernel<<<grid, block>>>(d_a);
+    int t = 0;
+    for(; t < Times; t++)
+    {
+        kernel<<<grid, block>>>(d_a);
+    }
+    
 
     checkCuda(cudaEventCreate(&stop));
     checkCuda(cudaEventSynchronize(stop));
