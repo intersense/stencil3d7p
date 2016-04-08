@@ -40,7 +40,7 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
         int offset = ((threadIdx.x + x) % elemsInPartition);
         int index = startIndex + offset;
         // Read from global memory location
-        readVal = d_arr[index];
+        readVal = d_arr[index]+1;
     }
     /* Write once to memory to prevent the above code from being optimized out */
     d_arr[0] = readVal;
@@ -54,7 +54,7 @@ __global__ void readBenchmark_PC(TYPE *d_arr)
     for (int x = 0; x < ITERATIONS; x+=16)
     {
         int index = ((threadIdx.x + x) % elemsInPartition);
-        readVal = d_arr[index];
+        readVal = d_arr[index]+1;
     }
     d_arr[0] = readVal;
 }
@@ -119,13 +119,12 @@ int main(int argc, char* *argv)
     }
     
 
-    checkCuda(cudaEventCreate(&stop));
+    checkCuda(cudaEventRecord(&stop));
     checkCuda(cudaEventSynchronize(stop));
-    
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
-
     printf("GPU kernel Elapsed Time (pure GPU):%f ms\n", milliseconds);
-    
+    // Copy to device
+    checkCuda(cudaMemcpy(a, d_a, data_size, cudaMemcpyDeviceToHost));
     cudaFreeHost(a);
     cudaFree(d_a);
     return 0;
