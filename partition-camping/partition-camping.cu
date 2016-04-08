@@ -40,8 +40,13 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
         int offset = ((threadIdx.x + x) % elemsInPartition);
         int index = startIndex + offset;
         // Read from global memory location
-        readVal = d_arr[index]+1;
-        //d_arr[index] = readVal;
+        //readVal = d_arr[index]+1;
+
+        if(index>0 && index < SIZE){
+            // Stencil 3d7p access pattern, west and east only
+            readVal = d_arr[index] + d_arr[index+1] + d_arr[index-1]
+            //d_arr[index] = readVal;
+        }
     }
     /* Write once to memory to prevent the above code from being optimized out */
     d_arr[0] = readVal;
@@ -55,8 +60,13 @@ __global__ void readBenchmark_PC(TYPE *d_arr)
     for (int x = 0; x < ITERATIONS; x+=16)
     {
         int index = ((threadIdx.x + x) % elemsInPartition);
-        readVal = d_arr[index]+1;
-        //d_arr[index] = readVal;
+        //readVal = d_arr[index]+1;
+
+        if (index >0 && index < elemsInPartition)
+        {
+            readVal = d_arr[index] + d_arr[index-1] + d_arr[index+1];
+            //d_arr[index] = readVal;
+        }
     }
     d_arr[0] = readVal;
 }
