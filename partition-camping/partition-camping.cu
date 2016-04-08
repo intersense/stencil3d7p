@@ -44,7 +44,7 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
 
         if(index>0 && index < SIZE){
             // Stencil 3d7p access pattern, west and east only
-            readVal = d_arr[index] + d_arr[index+1] + d_arr[index-1]
+            readVal = d_arr[index] + d_arr[index+1] + d_arr[index-1];
             //d_arr[index] = readVal;
         }
     }
