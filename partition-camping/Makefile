@@ -1,5 +1,5 @@
 default:
-    nvcc partition-camping.cu -o partition-camping.o
+        nvcc partition-camping.cu -o partition-camping.o
 
 clean:
-    rm *.o
+        rm *.o
