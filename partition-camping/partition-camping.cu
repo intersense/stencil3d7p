@@ -114,7 +114,7 @@ int main(int argc, char* *argv)
     int t = 0;
     for(; t < Times; t++)
     {
-        kernel<<<grid, block>>>(d_a);
+        readBenchmark_PC<<<grid, block>>>(d_a);
     }
     
 
