@@ -67,7 +67,7 @@ int main(int argc, char* *argv)
     const int PC = atoi(argv[1]);
     const int bx = atoi(argv[2]);
     const int by = atoi(argv[3]);
-    const int times = atoi(argv[4]);
+    const int Times = atoi(argv[4]);
 
     const int data_size = SIZE * sizeof(TYPE);
 
