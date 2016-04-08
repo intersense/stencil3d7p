@@ -110,6 +110,7 @@ int main(int argc, char* *argv)
     cudaEvent_t start, stop;
     checkCuda(cudaEventCreate(&start));
     checkCuda(cudaEventCreate(&stop));
+    
     checkCuda(cudaEventRecord(start));
     // The kernel
     int t = 0;
@@ -119,7 +120,7 @@ int main(int argc, char* *argv)
     }
     
 
-    checkCuda(cudaEventRecord(&stop));
+    checkCuda(cudaEventRecord(stop));
     checkCuda(cudaEventSynchronize(stop));
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
     printf("GPU kernel Elapsed Time (pure GPU):%f ms\n", milliseconds);
