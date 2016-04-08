@@ -88,7 +88,7 @@ int main(int argc, char* *argv)
     checkCuda(cudaMalloc((void**)&d_a, data_size));
     
     int i = 0;
-    for(; i < s; i++) {
+    for(; i < SIZE; i++) {
         a[i] = 1 + rand() / RAND_MAX;
     }
 
