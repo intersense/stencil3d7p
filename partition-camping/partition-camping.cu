@@ -6,7 +6,7 @@
 #define NX 512
 #define NY 512
 #define SIZE (NX*NY)
-
+#define NUM_PARTITION 16
 typedef int TYPE;
 
 // Convenience function for checking CUDA runtime API results
@@ -26,7 +26,7 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
 {
     // assign unique partititions to blocks,
     // where number of partitions is 8
-    int curPartition = blockIdx.x % 8;
+    int curPartition = blockIdx.x % NUM_PARTITION;
     // size of eache partition: 256 bytes
     int elemsInPartition = 256 / sizeof(TYPE);
     // jumpto unique partition
@@ -40,13 +40,13 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
         int offset = ((threadIdx.x + x) % elemsInPartition);
         int index = startIndex + offset;
         // Read from global memory location
-        //readVal = d_arr[index]+1;
+        readVal = d_arr[index]+1;
 
-        if(index > NX && index < SIZE){
+        /*if(index > NX && index < SIZE){
             // Stencil 3d7p access pattern, west and east only
             readVal = d_arr[index] + d_arr[index+1] + d_arr[index-1] + d_arr[index + NX] + d_arr[index-NX];
             //d_arr[index] = readVal;
-        }
+        }*/
     }
     /* Write once to memory to prevent the above code from being optimized out */
     d_arr[0] = readVal;
@@ -60,13 +60,7 @@ __global__ void readBenchmark_PC(TYPE *d_arr)
     for (int x = 0; x < ITERATIONS; x+=16)
     {
         int index = ((threadIdx.x + x) % elemsInPartition);
-        //readVal = d_arr[index]+1;
-
-        if (index > 0 && index < elemsInPartition)
-        {
-            readVal = d_arr[index] + d_arr[index-1] + d_arr[index+1];
-            //d_arr[index] = readVal;
-        }
+        readVal = d_arr[index]+1;
     }
     d_arr[0] = readVal;
 }
