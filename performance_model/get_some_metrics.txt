@@ -1,4 +1,7 @@
 # glmem
 nvprof --metrics gld_transactions,gld_throughput,gld_transactions_per_request,gst_throughput,gld_efficiency,gst_transactions_per_request,gst_efficiency,global_replay_overhead,shared_load_throughput,achieved_occupancy ./verify-glmem.o 0 256 256 256 256 1 1
+
+nvprof --metrics gld_transactions,gld_throughput,gld_transactions_per_request,gst_throughput,gld_efficiency,gst_transactions_per_request,gst_efficiency,achieved_occupancy ./verify-glmem.o 0 512 512 512 512 1 1
+
 # shmem
 nvprof --metrics gld_transactions,gld_throughput,gld_transactions_per_request,gst_throughput,gld_efficiency,gst_transactions_per_request,gst_efficiency,global_replay_overhead,shared_load_throughput,achieved_occupancy ./verify-adam.o 256 256 256 32 8 1
