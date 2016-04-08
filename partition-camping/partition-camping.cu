@@ -26,7 +26,7 @@ __global__ void readBenchmark_no_PC(TYPE *d_arr)
 {
     // assign unique partititions to blocks,
     // where number of partitions is 8
-    int curPartition = blokIdx.x % 8;
+    int curPartition = blockIdx.x % 8;
     // size of eache partition: 256 bytes
     int elemsInPartition = 256 / sizeof(TYPE);
     // jumpto unique partition
@@ -52,7 +52,7 @@ __global__ void readBenchmark_PC(TYPE *d_arr)
     TYPE readVal = 0;
     for (int x = 0; x < ITERATIONS; x+=16)
     {
-        init index = ((threadIdx.x + x) % elemsInPartition);
+        int index = ((threadIdx.x + x) % elemsInPartition);
         readVal = d_arr[index];
     }
     d_arr[0] = readVal;
@@ -65,15 +65,16 @@ int main(int argc, char* *argv)
         return 1;
     }
     const int PC = atoi(argv[1]);
-    const int nx = atoi(argv[2]);
-    const int ny = atoi(argv[3]);
+    const int bx = atoi(argv[2]);
+    const int by = atoi(argv[3]);
 
     const int data_size = SIZE * sizeof(TYPE);
 
     TYPE *a;
-    Type *d_a; 
+    TYPE *d_a; 
 
-    void (*kernel)(Type *);
+    void (*kernel)(TYPE *);
+
     if (PC == 0) kernel = &readBenchmark_no_PC;
     if (PC == 1) kernel = &readBenchmark_PC;
 
@@ -93,8 +94,6 @@ int main(int argc, char* *argv)
 
 
     float milliseconds = 0;
-
-    checkCuda(cudaEventRecord(start));
     
     // Copy to device
     checkCuda(cudaMemcpy(d_a, a, data_size, cudaMemcpyHostToDevice));
@@ -102,7 +101,7 @@ int main(int argc, char* *argv)
     dim3 grid((NX+bx-1)/bx, (NY+by-1)/by);
     dim3 block(bx, by);
     printf("grid:(%d, %d)\n", grid.x, grid.y);
-    printf("block:(%d, %d)\n", tx, ty);
+    printf("block:(%d, %d)\n", bx, by);
     
     // Timing
     cudaEvent_t start, stop;
