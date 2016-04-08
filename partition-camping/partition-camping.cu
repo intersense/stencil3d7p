@@ -70,7 +70,7 @@ int main(int argc, char* *argv)
     const int by = atoi(argv[3]);
     const int Times = atoi(argv[4]);
     printf("times:%d\n", Times);
-    
+
     const int data_size = SIZE * sizeof(TYPE);
 
     TYPE *a;
@@ -109,12 +109,13 @@ int main(int argc, char* *argv)
     // Timing
     cudaEvent_t start, stop;
     checkCuda(cudaEventCreate(&start));
-    
+    checkCuda(cudaEventCreate(&stop));
+    checkCuda(cudaEventRecord(start));
     // The kernel
     int t = 0;
     for(; t < Times; t++)
     {
-        readBenchmark_PC<<<grid, block>>>(d_a);
+        kernel<<<grid, block>>>(d_a);
     }
     
 
