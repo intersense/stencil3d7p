@@ -90,7 +90,7 @@ int main(int argc, char* *argv)
     
     int i = 0;
     for(; i < SIZE; i++) {
-        a[i] = 1 + rand() / RAND_MAX;
+        a[i] = rand();
         printf("a[%d]=%d", i, a[i]);
     }
 
