@@ -29,7 +29,7 @@ void initial_data(float *h_A, float *h_B, const int xyz){
 }
 
 int main(int argc, char* *argv){
-    if(argc != 7) {
+    if(argc != 8) {
         printf("USAGE: %s <Store_Cached><NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
         return 1;
     }
