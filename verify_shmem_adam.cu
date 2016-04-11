@@ -30,19 +30,28 @@ void initial_data(float *h_A, float *h_B, const int xyz){
 
 int main(int argc, char* *argv){
     if(argc != 7) {
-        printf("USAGE: %s <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
+        printf("USAGE: %s <Store_Cached><NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
         return 1;
     }
     // program parameters trans
-    const int nx = atoi(argv[1]);
-    const int ny = atoi(argv[2]);
-    const int nz = atoi(argv[3]);
-    const int tx = atoi(argv[4]);
-    const int ty = atoi(argv[5]);
-    const int timesteps = atoi(argv[6]);
+    // st_cached is for whether the computed results cached in shared memory
+    // 0: no; 1: yes
+    const int st_cached = atoi(argv[1]);
+    const int nx = atoi(argv[2]);
+    const int ny = atoi(argv[3]);
+    const int nz = atoi(argv[4]);
+    const int tx = atoi(argv[5]);
+    const int ty = atoi(argv[6]);
+    const int timesteps = atoi(argv[7]);
     
     const int xyz = nx * ny * nz;
     const int xyz_bytes = xyz * sizeof(float);
+
+    void (*kernel)(float *, float *, const int , const int , const int , float );
+    if (st_cached == 0)
+        kernel = &jacobi3d_7p_shmem_adam;
+    if (st_cached == 1)
+        kernel = &jacobi3d_7p_shmem_adam_store_shmem; 
 
     float *h_A;
     float *h_B;
@@ -116,7 +125,7 @@ int main(int argc, char* *argv){
 
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi3d_7p_shmem_adam<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
+        kernel<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
         // swap input and output
         tmp = input;
         input =  output;
