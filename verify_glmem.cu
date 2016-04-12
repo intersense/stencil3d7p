@@ -77,7 +77,8 @@ int main(int argc, char* *argv){
         h_dA[i] = 1 + (float)rand() / (float)RAND_MAX;
         h_dA1[i] = h_dB1[i] = h_dB[i] =  h_dA[i];
     }
-    printf("Iniatialized data[%d]=%f\n", 2*nx+2, h_dA[2*nx+2]);
+    int testIndex = 2*nx+2;
+    printf("Iniatialized data[%d]=%f\n", testIndex , h_dA[testIndex]);
     printf("Start computing... \n");   
 
     // Always use device 0
@@ -143,7 +144,6 @@ int main(int argc, char* *argv){
     double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / milliseconds;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
     
-    float *gpuResult;
     // Copy the result to main memory
     if(timesteps%2==0){
         checkCuda(cudaEventRecord(start));
@@ -153,19 +153,17 @@ int main(int argc, char* *argv){
         checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
         printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
         printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
-        gpuResult =  h_dB;
     }
     else{
         checkCuda(cudaEventRecord(start));
-        checkCuda(cudaMemcpy(h_dA, input, xyz_bytes, cudaMemcpyDeviceToHost));
+        checkCuda(cudaMemcpy(h_dB, input, xyz_bytes, cudaMemcpyDeviceToHost));
         checkCuda(cudaEventRecord(stop));
         checkCuda(cudaEventSynchronize(stop));
         checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
         printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
         printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
-        gpuResult = h_dA;
     }
-    
+    float *gpuResult = h_dB;
     
 
     // Run the CPU version
@@ -216,8 +214,8 @@ int main(int argc, char* *argv){
     else {
       printf("Correctness, PASSED\n");
     }
-    printf("GPU[%d]=%f\n", 2*nx+2, gpuResult[2*nx+2]);
-    printf("CPU[%d]=%f\n", 2*nx+2, cpuResult[2*nx+2]);
+    printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
+    printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
     // Free buffers
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
