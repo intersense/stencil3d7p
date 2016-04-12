@@ -1,4 +1,3 @@
-#include <stdio.h>
 void jacobi7(const int nx,const int ny, const int nz, float* A0, float* Anext, float fac) 
 {
   //float *temp_ptr;
@@ -17,7 +16,7 @@ void jacobi7(const int nx,const int ny, const int nz, float* A0, float* Anext, f
                 A0[i+nx*(j+ ny*( k - 1))] +
                 A0[i+nx*((j + 1)+ ny*k)] +
                 A0[i+nx*((j - 1)+ ny*k)] +
-                A0[i+1+nx*(j+ ny*k)] +
+                A0[(i+1)+nx*(j+ ny*k)] +
                 A0[(i - 1)+nx*(j+ ny*k)]
                 -  A0[i+nx*(j+ ny*k)] *fac ;                
         }
