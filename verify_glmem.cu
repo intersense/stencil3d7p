@@ -80,8 +80,10 @@ int main(int argc, char* *argv){
     
     // A simple comparison of the result
     int testIndex = 2*nx+3;
-
     printf("Iniatialized data[%d]=%f\n", testIndex , h_dA[testIndex]);
+    printf("h_dA1[%d]=%f\n", testIndex, h_dA1[testIndex]);
+    printf("h_dB1[%d]=%f\n", testIndex, h_dB1[testIndex]);
+    
     printf("Start computing... \n");   
 
     // Always use device 0
