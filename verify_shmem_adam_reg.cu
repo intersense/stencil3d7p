@@ -2,6 +2,7 @@
 #include <cuda.h>
 #include <stdio.h>
 #include <jacobi7_cuda.h>
+#include <jacobi7.h>
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
