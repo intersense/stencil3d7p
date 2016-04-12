@@ -114,7 +114,7 @@ int main(int argc, char* *argv){
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
     printf("Data %dMB transferred H2D time:%f ms\n", xyz_bytes >> 20, milliseconds);
     printf("Bandwidth H2D:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
-    //checkCuda(cudaMemcpy(d_dB, d_dA, xyz_bytes, cudaMemcpyDeviceToDevice));
+    checkCuda(cudaMemcpy(d_dB, d_dA, xyz_bytes, cudaMemcpyDeviceToDevice));
     
     // Setup the kernel
     float* input = d_dA;
