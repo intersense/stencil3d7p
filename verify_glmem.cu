@@ -149,7 +149,7 @@ int main(int argc, char* *argv){
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
     
     // Copy the result to main memory
-    if(timesteps%2 == 0){
+    if((timesteps%2) == 0){
         checkCuda(cudaEventRecord(start));
         checkCuda(cudaMemcpy(h_dB, output, xyz_bytes, cudaMemcpyDeviceToHost));
         checkCuda(cudaEventRecord(stop));
@@ -180,7 +180,7 @@ int main(int argc, char* *argv){
         h_dB1 = tmp1;
     }
     float *cpuResult;
-    if (timesteps%2 == 0)
+    if ((timesteps%2) == 0)
         cpuResult = h_dB1;
     else
         cpuResult = h_dA1;
