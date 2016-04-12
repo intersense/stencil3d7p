@@ -5,7 +5,7 @@ void jacobi7(const int nx,const int ny, const int nz, float* A0, float* Anext, f
   int i, j, k;   
   //float *l0, *lnext;
   //float fac = 6.0/(A0[0]*A0[0]);
-  float *tmp;
+  //float *tmp;
 //  for (t = 0; t < timesteps; t++) {
     /*if (t%2 == 0) { l0 = A0; lnext = Anext; }
     else {lnext = A0; l0 = Anext; }*/

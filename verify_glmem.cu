@@ -199,8 +199,6 @@ int main(int argc, char* *argv){
         diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
         refNorm += cpuResult[i] * cpuResult[i];
-        if (gpuResult[i] != gpuResult[i])
-                   diff = 1;
     }
     errorNorm = sqrt(errorNorm);
     refNorm   = sqrt(refNorm);
@@ -212,12 +210,13 @@ int main(int argc, char* *argv){
       printf("Correctness, FAILED\n");
     }
     else if((errorNorm / refNorm) > 1e-2) {
-      printf("Correct  ness, FAILED\n");
+      printf("Correctness, FAILED\n");
     }
     else {
       printf("Correctness, PASSED\n");
     }
-
+    printf("GPU[%d]=%f\n", 2*nx+2, gpuResult[2*nx+2]);
+    printf("CPU[%d]=%f\n", 2*nx+2, cpuResult[2*nx+2]);
     // Free buffers
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
