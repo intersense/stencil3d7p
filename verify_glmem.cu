@@ -77,6 +77,7 @@ int main(int argc, char* *argv){
         h_dA[i] = 1 + (float)rand() / (float)RAND_MAX;
         h_dA1[i] = h_dB1[i] = h_dB[i] =  h_dA[i];
     }
+    printf("Iniatialized data[%d]=%f\n", 2*nx+2, h_dA[2*nx+2]);
     printf("Start computing... \n");   
 
     // Always use device 0
