@@ -6,7 +6,8 @@
 #include <sys/time.h>
 #include <math.h>
 #include "getopt.h"
-#include "include/jacobi7_cuda.h"
+#include "jacobi7_cuda.h"
+#include "jacobi7.h"
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
@@ -193,11 +194,12 @@ int main(int argc, char* *argv){
     double errorNorm, refNorm, diff;
     errorNorm = 0.0;
     refNorm = 0.0;
+    i = 0;
     for (; i < xyz; ++i){
         diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
         refNorm += cpuResult[i] * cpuResult[i];
-        if (gpuResult[i+nx*(j+ny*k)] != gpuResult[i+nx*(j+ny*k)])
+        if (gpuResult[i] != gpuResult[i])
                    diff = 1;
     }
     errorNorm = sqrt(errorNorm);
