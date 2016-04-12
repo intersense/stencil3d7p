@@ -56,14 +56,17 @@ int main(int argc, char* *argv){
     const int xyz = nx * ny * nz;
     const int xyz_bytes = xyz * sizeof(float);
 
-    float *h_dA;
-    float *h_dB;
+    float *h_dA, *h_dA1;
+    float *h_dB, *h_dB1;
     float *d_dA;
     float *d_dB;
     
     // Allocate host buffers
     checkCuda(cudaMallocHost((void**)&h_dA, xyz_bytes)); // host pinned
     checkCuda(cudaMallocHost((void**)&h_dB, xyz_bytes));
+    // for comparison btw CPU and GPU version
+    checkCuda(cudaMallocHost((void**)&h_dA1, xyz_bytes));
+    checkCuda(cudaMallocHost((void**)&h_dB1, xyz_bytes));
 
     // grid data iniatialization   
     // randomly generaed test data
@@ -71,7 +74,7 @@ int main(int argc, char* *argv){
     int i = 0;
     for(; i < xyz; i++) {
         h_dA[i] = 1 + (float)rand() / (float)RAND_MAX;
-        h_dB[i] =  h_dA[i];
+        h_dA1[i] = h_dB1[i] = h_dB[i] =  h_dA[i];
     }
     printf("Start computing... \n");   
 
@@ -138,6 +141,7 @@ int main(int argc, char* *argv){
     double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / milliseconds;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
     
+    float *gpuResult;
     // Copy the result to main memory
     if(timesteps%2==0){
         checkCuda(cudaEventRecord(start));
@@ -147,47 +151,55 @@ int main(int argc, char* *argv){
         checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
         printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
         printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
+        gpuResult =  h_dB;
     }
     else{
         checkCuda(cudaEventRecord(start));
-        checkCuda(cudaMemcpy(h_dB, input, xyz_bytes, cudaMemcpyDeviceToHost));
+        checkCuda(cudaMemcpy(h_dA, input, xyz_bytes, cudaMemcpyDeviceToHost));
         checkCuda(cudaEventRecord(stop));
         checkCuda(cudaEventSynchronize(stop));
         checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
         printf("Data %dMB transferred D2H time:%f ms\n", xyz_bytes >> 20, milliseconds);
         printf("Bandwidth D2H:%f MB/s\n", (float)(xyz_bytes >> 20)/(milliseconds/1000));
+        gpuResult = h_dA;
     }
     
     
 
     // Run the CPU version
-    /*float startTime = rtclock();
+    //float startTime = rtclock();
+    float *tmp1;
     for(int t = 0; t < timesteps; t += 1) {
         jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
         tmp1 = h_dA1;
         h_dA1 = h_dB1;
         h_dB1 = tmp1;
     }
-    float endTime = rtclock();
+    float *cpuResult;
+    if (timesteps%2 == 0)
+        cpuResult = h_dB1;
+    else
+        cpuResult = h_dA1;
+    /*float endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
 
     printf("Elapsed Time:%lf\n", elapsedTimeC);
     flops = xyz * 7.0 * timesteps;
     gflops = flops / elapsedTimeC / 1e9;
     printf("(CPU) %lf GFlop/s\n", gflops);
-
+    */
 
     // compare the results btw CPU and GPU version
     double errorNorm, refNorm, diff;
     errorNorm = 0.0;
     refNorm = 0.0;
     for (; i < xyz; ++i){
-        diff = h_dA1[i] - h_dB[i];
+        diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
-        refNorm += h_dA1[i] * h_dA1[i];
-        /*if (h_dB[i+nx*(j+ny*k)] != h_dA1[i+nx*(j+ny*k)])
-                   diff = 1;*/
-    /*}
+        refNorm += cpuResult[i] * cpuResult[i];
+        if (gpuResult[i+nx*(j+ny*k)] != gpuResult[i+nx*(j+ny*k)])
+                   diff = 1;
+    }
     errorNorm = sqrt(errorNorm);
     refNorm   = sqrt(refNorm);
 
@@ -204,20 +216,11 @@ int main(int argc, char* *argv){
       printf("Correctness, PASSED\n");
     }
 
-    /*printf("h_dB[%d]:%f\n", 2+ny*(3+nz*4), h_dB[2+ny*(3+nz*4)]);
-    printf("h_dA[%d]:%f\n", 2+ny*(3+nz*4), h_dA[2+ny*(3+nz*4)]);
-    printf("h_dB1[%d]:%f\n", 2+ny*(3+nz*4), h_dB1[2+ny*(3+nz*4)]);
-    printf("h_dA1[%d]:%f\n", 2+ny*(3+nz*4), h_dA1[2+ny*(3+nz*4)]);
-    printf("-----------------------------------\n");
-    printf("h_dB[%d]:%f\n", 3+ny*(4+nz*5), h_dB[3+ny*(4+nz*5)]);
-    printf("h_dA[%d]:%f\n", 3+ny*(4+nz*5), h_dA[3+ny*(4+nz*5)]);
-    printf("h_dB1[%d]:%f\n", 3+ny*(4+nz*5), h_dB1[3+ny*(4+nz*5)]);
-    printf("h_dA1[%d]:%f\n", 3+ny*(4+nz*5), h_dA1[3+ny*(4+nz*5)]);
-    */
-    
     // Free buffers
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
+    cudaFreeHost(h_dA1);
+    cudaFreeHost(h_dB1);
     cudaFree(d_dA);
     cudaFree(d_dB);
     return 0;
