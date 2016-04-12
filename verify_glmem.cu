@@ -79,7 +79,7 @@ int main(int argc, char* *argv){
     }
     
     // A simple comparison of the result
-    int testIndex = 2*nx+3;
+    int testIndex = 3 + 3*nx+ 3*nx*ny;
     printf("Iniatialized data[%d]=%f\n", testIndex , h_dA[testIndex]);
     printf("h_dA1[%d]=%f\n", testIndex, h_dA1[testIndex]);
     printf("h_dB1[%d]=%f\n", testIndex, h_dB1[testIndex]);
