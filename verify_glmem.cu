@@ -30,6 +30,13 @@ double rtclock(){
   return (tp.tv_sec + tp.tv_usec*1.0e-6);
 }
 
+inline void swap(float *a, float *b)
+{
+    float *tmp = a;
+    a = b;
+    b = tmp;
+}
+
 int main(int argc, char* *argv){
     if(argc != 8) {
         printf("USAGE: %s <0row_or_1col_first> <NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
@@ -132,9 +139,7 @@ int main(int argc, char* *argv){
     checkCuda(cudaEventRecord(start));
     for(int t = 0; t < timesteps; t += 1) {
         kernel<<<grid, block>>>(input, output, nx, ny, nz, fac);
-        tmp = input;
-        input =  output;
-        output = tmp;
+        swap(input, output);
     }
     checkCuda(cudaEventRecord(stop));
     checkCuda(cudaEventSynchronize(stop));
@@ -225,6 +230,7 @@ int main(int argc, char* *argv){
     printf("h_dB[%d]=%f\n", testIndex, d_dB[testIndex]);
     printf("h_dA1[%d]=%f\n", testIndex, h_dA1[testIndex]);
     printf("h_dB1[%d]=%f\n", testIndex, h_dB1[testIndex]);
+
     // Free buffers
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
