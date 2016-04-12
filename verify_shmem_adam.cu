@@ -79,7 +79,7 @@ int main(int argc, char* *argv){
     int i = 0;
     for(; i < xyz; i++) {
         h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
-        h_A1[i] = h_B1[i] = h_dB[i] =  h_A[i];
+        h_A1[i] = h_B1[i] = h_B[i] =  h_A[i];
     }
     // A simple comparison of the result
     int testIndex = 3 + 3*nx+ 3*nx*ny;
@@ -230,7 +230,7 @@ int main(int argc, char* *argv){
     printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
     printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
     printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
-    printf("h_dB[%d]=%f\n", testIndex, h_dB[testIndex]);
+    printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
 
