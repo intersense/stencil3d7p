@@ -77,7 +77,10 @@ int main(int argc, char* *argv){
         h_dA[i] = 1 + (float)rand() / (float)RAND_MAX;
         h_dA1[i] = h_dB1[i] = h_dB[i] =  h_dA[i];
     }
-    int testIndex = 2*nx+2;
+    
+    // A simple comparison of the result
+    int testIndex = 2*nx+3;
+
     printf("Iniatialized data[%d]=%f\n", testIndex , h_dA[testIndex]);
     printf("Start computing... \n");   
 
@@ -137,6 +140,7 @@ int main(int argc, char* *argv){
     
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
 
+    // Output the time and GFLOPs of the pure GPU kernel
     printf("GPU kernel Elapsed Time (pure GPU):%f ms\n", milliseconds);
     double gflop = (xyz * 1e-9) * 7.0 * timesteps;
     double gflop_per_sec = gflop * 1e3 / milliseconds;
@@ -145,7 +149,7 @@ int main(int argc, char* *argv){
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
     
     // Copy the result to main memory
-    if(timesteps%2==0){
+    if(timesteps%2 == 0){
         checkCuda(cudaEventRecord(start));
         checkCuda(cudaMemcpy(h_dB, output, xyz_bytes, cudaMemcpyDeviceToHost));
         checkCuda(cudaEventRecord(stop));
@@ -216,6 +220,10 @@ int main(int argc, char* *argv){
     }
     printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
     printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
+    printf("h_dA[%d]=%f\n", testIndex, h_dA[testIndex]);
+    printf("h_dB[%d]=%f\n", testIndex, d_dB[testIndex]);
+    printf("h_dA1[%d]=%f\n", testIndex, h_dA1[testIndex]);
+    printf("h_dB1[%d]=%f\n", testIndex, h_dB1[testIndex]);
     // Free buffers
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
