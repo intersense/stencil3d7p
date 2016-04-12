@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <jacobi7_cuda.h>
+#include <jacobi7.h>
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
@@ -18,7 +19,7 @@ cudaError_t checkCuda(cudaError_t result)
   return result;
 }
 
-void initial_data(float *h_A, float *h_B, const int xyz){
+/*void initial_data(float *h_A, float *h_B, const int xyz){
     // randomly generaed test data
     srand(time(NULL));
     int i = 0;
@@ -26,7 +27,7 @@ void initial_data(float *h_A, float *h_B, const int xyz){
         h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
         h_B[i] =  h_A[i];
     }
-}
+}*/
 
 int main(int argc, char* *argv){
     if(argc != 8) {
@@ -53,8 +54,8 @@ int main(int argc, char* *argv){
     if (st_cached == 1)
         kernel = &jacobi3d_7p_shmem_adam_store_shmem; 
 
-    float *h_A;
-    float *h_B;
+    float *h_A, *h_A1;
+    float *h_B, *h_B1;
     float *d_A;
     float *d_B;
     
@@ -68,9 +69,23 @@ int main(int argc, char* *argv){
     checkCuda(cudaMallocHost((void**)&h_A, xyz_bytes)); // host pinned
     checkCuda(cudaMallocHost((void**)&h_B, xyz_bytes));
     
+    // for comparison btw CPU and GPU version
+    checkCuda(cudaMallocHost((void**)&h_A1, xyz_bytes));
+    checkCuda(cudaMallocHost((void**)&h_B1, xyz_bytes));
+
     // grid data iniatialization   
     // randomly generaed test data
-    initial_data(h_A, h_B, xyz);
+    srand(time(NULL));
+    int i = 0;
+    for(; i < xyz; i++) {
+        h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
+        h_A1[i] = h_B1[i] = h_dB[i] =  h_A[i];
+    }
+    // A simple comparison of the result
+    int testIndex = 3 + 3*nx+ 3*nx*ny;
+    printf("Iniatialized data[%d]=%f\n", testIndex , h_A[testIndex]);
+    printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
+    printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
 
     const float fac = 6.0/(h_A[0] * h_A[0]);
     float *tmp;
@@ -153,7 +168,8 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
-    
+    float *gpuResult = h_A;
+
     printf("Time of shared memory version (ms): %f\n", ms);
     printf("(including data transfer and memory allocation in GPU.)\n");
   
@@ -163,14 +179,71 @@ int main(int argc, char* *argv){
     mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
+    // Run the CPU version
+    //float startTime = rtclock();
+    float *tmp1;
+    for(int t = 0; t < timesteps; t += 1) {
+        jacobi7(nx, ny, nz, h_A1, h_B1, fac);
+        tmp1 = h_A1;
+        h_A1 = h_B1;
+        h_B1 = tmp1;
+    }
+    float *cpuResult;
+    if ((timesteps%2) == 0)
+        cpuResult = h_B1;
+    else
+        cpuResult = h_A1;
+    /*float endTime = rtclock();
+    double elapsedTimeC = endTime - startTime;
+
+    printf("Elapsed Time:%lf\n", elapsedTimeC);
+    flops = xyz * 7.0 * timesteps;
+    gflops = flops / elapsedTimeC / 1e9;
+    printf("(CPU) %lf GFlop/s\n", gflops);
+    */
+
+    // compare the results btw CPU and GPU version
+    double errorNorm, refNorm, diff;
+    errorNorm = 0.0;
+    refNorm = 0.0;
+    i = 0;
+    for (; i < xyz; ++i){
+        diff = cpuResult[i] - gpuResult[i];
+        errorNorm += diff * diff;
+        refNorm += cpuResult[i] * cpuResult[i];
+    }
+    errorNorm = sqrt(errorNorm);
+    refNorm   = sqrt(refNorm);
+
+    printf("Error Norm:%lf\n", errorNorm);
+    printf("Ref Norm:%lf\n", refNorm);
+  
+    if(abs(refNorm) < 1e-7) {
+      printf("Correctness, FAILED\n");
+    }
+    else if((errorNorm / refNorm) > 1e-2) {
+      printf("Correctness, FAILED\n");
+    }
+    else {
+      printf("Correctness, PASSED\n");
+    }
+    printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
+    printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
+    printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
+    printf("h_dB[%d]=%f\n", testIndex, h_dB[testIndex]);
+    printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
+    printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
 
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
-    cudaFree(d_A);
-    cudaFree(d_B);
     cudaFreeHost(h_A);
     cudaFreeHost(h_B);
+    cudaFreeHost(h_A1);
+    cudaFreeHost(h_B1);
+    cudaFree(d_A);
+    cudaFree(d_B);
+
     return 0;
 
 }

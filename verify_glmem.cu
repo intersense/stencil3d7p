@@ -226,7 +226,10 @@ int main(int argc, char* *argv){
     printf("h_dA1[%d]=%f\n", testIndex, h_dA1[testIndex]);
     printf("h_dB1[%d]=%f\n", testIndex, h_dB1[testIndex]);
 
-    // Free buffers
+    // cleanup
+    checkCuda( cudaEventDestroy(start));
+    checkCuda( cudaEventDestroy(stop));
+
     cudaFreeHost(h_dA);
     cudaFreeHost(h_dB);
     cudaFreeHost(h_dA1);
