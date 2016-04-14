@@ -184,87 +184,10 @@ int main(int argc, char* *argv){
     else {
       printf("Correctness, PASSED\n");
     }
-    int i = 1;
+    int i;
     int j;
     int k;
-    printf("(%d,%d,%d)\n",i,i,i);
-    printf("resultC[%d]:%f\n", i+nx*(i+ny*i), resultC[i+nx*(i+ny*i)]);
-    printf("resultG[%d]:%f\n", i+nx*(i+ny*i), resultG[i+nx*(i+ny*i)]);
-    printf("-----------------------------------\n");
-    i = 0;
-    printf("(%d,%d,%d)\n",i,i,i);
-    printf("resultC[%d]:%f\n", i+nx*(i+ny*i), resultC[i+nx*(i+ny*i)]);
-    printf("resultG[%d]:%f\n", i+nx*(i+ny*i), resultG[i+nx*(i+ny*i)]);
-    printf("-----------------------------------\n");
-    i=1;
-    j = 1;
-    k = 2;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
 
-
-    i=2;
-    j = 1;
-    k = 2;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
-
-    i = 2;
-    printf("(%d,%d,%d)\n",i,i,i);
-    printf("resultC[%d]:%f\n", i+nx*(i+ny*i), resultC[i+nx*(i+ny*i)]);
-    printf("resultG[%d]:%f\n", i+nx*(i+ny*i), resultG[i+nx*(i+ny*i)]);
-    printf("-----------------------------------\n");
-
-    /*i = 5;
-    printf("(%d,%d,%d)\n",i,i,i);
-    printf("resultC[%d]:%f\n", i+nx*(i+ny*i), resultC[i+nx*(i+ny*i)]);
-    printf("resultG[%d]:%f\n", i+nx*(i+ny*i), resultG[i+nx*(i+ny*i)]);
-    printf("-----------------------------------\n");
-
-
-    i=6;
-    j = 7;
-    k = 8;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
-
-    i=6;
-    j = ny-2;
-    k = 8;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
-    i=6;
-    j = ny-1;
-    k = 8;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
-
-    i = nx-2;
-    j = ny-2;
-    k = 8;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
-
-    i = nx-2;
-    j = ny-3;
-    k = ny-2;
-    printf("(%d,%d,%d)\n",i,j,k);
-    printf("resultC[%d]:%f\n", i+nx*(j+ny*k), resultC[i+nx*(j+ny*k)]);
-    printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
-    printf("-----------------------------------\n");
-    */
     i = 1;
     j = 1;
     k = ny-2;
