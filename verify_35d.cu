@@ -237,5 +237,4 @@ int main(int argc, char* *argv){
     cudaFreeHost(h_B1);
     cudaFree(d_A);
     cudaFree(d_B);
-
 }
