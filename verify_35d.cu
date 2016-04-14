@@ -163,6 +163,7 @@ int main(int argc, char* *argv){
 
     
     // Run the CPU version
+    double startTime, endTime;
     startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
         jacobi7(nx, ny, nz, h_A1, h_B1, fac);
@@ -180,8 +181,8 @@ int main(int argc, char* *argv){
     double elapsedTimeC = endTime - startTime;
 
     printf("Elapsed Time:%lf\n", elapsedTimeC);
-    flops = xyz * 7.0 * timesteps;
-    gflops = flops / elapsedTimeC / 1e9;
+    double flops = xyz * 7.0 * timesteps;
+    double gflops = flops / elapsedTimeC / 1e9;
     printf("(CPU) %lf GFlop/s\n", gflops);
 
 
