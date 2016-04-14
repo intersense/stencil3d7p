@@ -154,10 +154,10 @@ int main(int argc, char* *argv){
     // Copy the result to main memory
     float *resultG;
     if((timesteps/2) % 2){
-        checkCuda(cudaMemcpy(h_A, d_A, xyz_bytes, cudaMemcpyDeviceToHost));
+        checkCuda(cudaMemcpy(h_A, d_B, xyz_bytes, cudaMemcpyDeviceToHost));
     }
     else{
-        checkCuda(cudaMemcpy(h_A, d_B, xyz_bytes, cudaMemcpyDeviceToHost));
+        checkCuda(cudaMemcpy(h_A, d_A, xyz_bytes, cudaMemcpyDeviceToHost));
     }
     resultG = h_A;
 
@@ -173,9 +173,9 @@ int main(int argc, char* *argv){
     }
     float *resultC;
     if (timesteps % 2)
-        resultC = h_B1;
-    else
         resultC = h_A1;
+    else
+        resultC = h_B1;
 
     endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
