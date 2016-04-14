@@ -71,13 +71,7 @@ int main(int argc, char* *argv){
 
     printf("Start computing...\n");
     printf("h_dB[%d]:%f\n", 1+nx*(1+ny*1), h_dB[1+nx*(1+ny*1)]);
-    printf("h_dA[%d]:%f\n", 3+nx*(4+ny*5), h_dA[3+nx*(4+ny*5)]);
-
-
-    float *B = 0;
-    const int ldb = 0;
-    const int ldc = 0;
-    
+    printf("h_dA[%d]:%f\n", 3+nx*(4+ny*5), h_dA[3+nx*(4+ny*5)]);    
 
     // Always use device 0
     cudaSetDevice(0);
@@ -146,7 +140,7 @@ int main(int argc, char* *argv){
     // Run the CPU version
     startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi7(nx, ny, nz, h_dA1, B, h_dB1, fac);
+        jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
         tmp = h_dA1;
         h_dA1 = h_dB1;
         h_dB1 = tmp;
