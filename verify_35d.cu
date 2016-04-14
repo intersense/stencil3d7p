@@ -184,6 +184,9 @@ int main(int argc, char* *argv){
     else {
       printf("Correctness, PASSED\n");
     }
+    
+    // simple comparison
+    /*
     int i;
     int j;
     int k;
@@ -198,7 +201,7 @@ int main(int argc, char* *argv){
         printf("resultG[%d]:%f\n", i+nx*(j+ny*k), resultG[i+nx*(j+ny*k)]);
         printf("-----------------------------------\n");
     }
-
+    */
     // Free buffers
     free(h_dA);
     free(h_dB);
