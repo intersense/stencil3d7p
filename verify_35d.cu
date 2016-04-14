@@ -229,11 +229,13 @@ int main(int argc, char* *argv){
     }
     */
     // Free buffers
-    free(h_A);
-    free(h_B);
-    free(h_A1);
-    free(h_B1);
-    checkCuda(cudaFree(d_A));
-    checkCuda(cudaFree(d_B));
+    checkCuda( cudaEventDestroy(startEvent));
+    checkCuda( cudaEventDestroy(stopEvent));
+    cudaFreeHost(h_A);
+    cudaFreeHost(h_B);
+    cudaFreeHost(h_A1);
+    cudaFreeHost(h_B1);
+    cudaFree(d_A);
+    cudaFree(d_B);
 
 }
