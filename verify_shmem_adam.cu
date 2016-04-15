@@ -204,7 +204,7 @@ int main(int argc, char* *argv){
         diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
         refNorm += cpuResult[i] * cpuResult[i];
-        if (errorNorm > 1e-6)
+        if (abs(diff)> 1e-6)
         {
             printf("GPU[%d]=%f\n", i, gpuResult[i]);
             printf("CPU[%d]=%f\n", i, cpuResult[i]);
