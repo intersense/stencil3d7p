@@ -9,8 +9,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
   const int ty = threadIdx.y + 1;
 
   int CURRENT_G = ix + iy*nx + nx*ny;
-  //int CURRENT_S = tx + ty*bx;
-  int CURRENT_S = threadIdx.x + threadIdx.y * bx;
+  int CURRENT_S = tx + ty*(bx+2);
   extern __shared__ float s_data[];
 
   float curr;
