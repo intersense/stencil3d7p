@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include "getopt.h"
-#include "include/jacobi7_cuda.h"
+#include "jacobi7_cuda_3d.h"
 #include "include/jacobi7.h"
 
 //#ifndef TIME_TILE_SIZE

@@ -7,8 +7,8 @@
 #include <sys/time.h>
 #include <math.h>
 #include "getopt.h"
-#include "include/jacobi7_cuda.h"
-#include "include/jacobi7.h"
+#include "jacobi7_cuda_glmem.h"
+#include "jacobi7.h"
 
 int main(int argc, char* *argv){
     if(argc != 7) {

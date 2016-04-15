@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include "getopt.h"
-#include "include/jacobi7_cuda.h"
+#include "jacobi7_cuda_glmem.h"
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.

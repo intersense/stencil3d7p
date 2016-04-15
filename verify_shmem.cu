@@ -7,8 +7,8 @@
 #include <sys/time.h>
 #include <math.h>
 #include "getopt.h"
-#include "include/jacobi7_cuda.h"
-#include "include/jacobi7.h"
+#include "jacobi7_cuda_shared.h"
+#include "jacobi7.h"
 
 // Timer function
 double rtclock(){
