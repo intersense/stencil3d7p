@@ -12,8 +12,6 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
   int CURRENT_S = tx + ty*bx;
 
   extern __shared__ float s_data[];
-  /*const float C0 = 1.0f;
-  const float C1 = 7.0f;*/
 
   float curr;
   float right, left;
@@ -45,7 +43,6 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
   {
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
-    //d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] +s_data[CURRENT_S-bx] + s_data[CURRENT_S+bx] +front + back - s_data[CURRENT_S] * fac;
   }
   //#pragma unroll 
   for(int k=1; k<nz-2; k++)

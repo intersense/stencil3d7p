@@ -19,16 +19,6 @@ cudaError_t checkCuda(cudaError_t result)
   return result;
 }
 
-/*void initial_data(float *h_A, float *h_B, const int xyz){
-    // randomly generaed test data
-    srand(time(NULL));
-    int i = 0;
-    for(; i < xyz; i++) {
-        h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
-        h_B[i] =  h_A[i];
-    }
-}*/
-
 int main(int argc, char* *argv){
     if(argc != 8) {
         printf("USAGE: %s <Store_Cached><NX> <NY> <NZ> <TX> <TY> <TIME STEPS>\n", argv[0]);
@@ -110,7 +100,7 @@ int main(int argc, char* *argv){
     // set the shared memory bank size to eight bytes
     //checkCuda(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
     
-    // ****** up and down not in shmem
+    // ****** front and back not in shmem
     const int sharedMemSize = (block.x + 2) * (block.y + 2) * sizeof(float); 
     printf("Shared Memory Size: %dKB\n", sharedMemSize>>10);
     // create events and streams
@@ -165,6 +155,7 @@ int main(int argc, char* *argv){
         checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
     else
         checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
+
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
@@ -233,7 +224,22 @@ int main(int argc, char* *argv){
     printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
+    
+    testIndex = 2 + 2*nx+ 2*nx*ny;
+    printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
+    printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
+    printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
+    printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
+    printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
+    printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
 
+    testIndex = 0;
+    printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
+    printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
+    printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
+    printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
+    printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
+    printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
