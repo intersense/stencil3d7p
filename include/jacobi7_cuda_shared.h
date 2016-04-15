@@ -26,11 +26,11 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
   front = d_in[CURRENT_G + nx*ny]; 
 
   // Load halo region into shared memory
-  if(tx > 1 && tx < bx-1 && ix > 0 && ix < nx-1){
+  if(tx > 1 && tx < bx && ix > 0 && ix < nx-1){
     s_data[CURRENT_S - 1]  = d_in[CURRENT_G - 1];
     s_data[CURRENT_S + 1]  = d_in[CURRENT_G + 1];
   }
-  if(ty > 1 && ty < by-1 && iy > 0 && iy < ny-1){
+  if(ty > 1 && ty < by && iy > 0 && iy < ny-1){
     s_data[CURRENT_S - bx] = d_in[CURRENT_G - nx];
     s_data[CURRENT_S + bx] = d_in[CURRENT_G + nx];
   }
@@ -60,11 +60,11 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
 
     // Load halo region into shared memory
 
-    if(tx > 1 && tx < bx-1 && ix > 0 && ix < nx-1){
+    if(tx > 1 && tx < bx && ix > 0 && ix < nx-1){
       s_data[CURRENT_S - 1]  = d_in[CURRENT_G - 1];
       s_data[CURRENT_S + 1]  = d_in[CURRENT_G + 1];
     }
-    if(ty > 1 && ty < by-1 && iy > 0 && iy < ny-1){
+    if(ty > 1 && ty < by && iy > 0 && iy < ny-1){
       s_data[CURRENT_S - bx] = d_in[CURRENT_G - nx];
       s_data[CURRENT_S + bx] = d_in[CURRENT_G + nx];
     }
