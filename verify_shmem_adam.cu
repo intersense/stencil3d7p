@@ -74,6 +74,8 @@ int main(int argc, char* *argv){
     // A simple comparison of the result
     int testIndex = 3 + 3*nx+ 3*nx*ny;
     printf("Iniatialized data[%d]=%f\n", testIndex , h_A[testIndex]);
+    printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
+    printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
 
