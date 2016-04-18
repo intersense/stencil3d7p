@@ -1,7 +1,5 @@
 //jacobi7.cu
 #include <cuda.h>
-#include <cuda_runtime.h>
-#include <cuda_call.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -14,6 +12,20 @@
 //#warning TIME_TILE_SIZE is not set, defaulting to 1
 //#define TIME_TILE_SIZE 2
 //#endif
+
+// Convenience function for checking CUDA runtime API results
+// can be wrapped around any runtime API call. No-op in release builds.
+inline
+cudaError_t checkCuda(cudaError_t result)
+{
+#if defined(DEBUG) || defined(_DEBUG)
+  if (result != cudaSuccess) {
+    fprintf(stderr, "CUDA Runtime Error: %s\n", cudaGetErrorString(result));
+    assert(result == cudaSuccess);
+  }
+#endif
+  return result;
+}
 
 // Timer function
 double rtclock(){
@@ -66,12 +78,7 @@ int main(int argc, char* *argv){
     }
     printf("Start computing...");
     printf("h_dB[%d]:%f\n", 2+32*(3+32*4), h_dB[2+32*(3+32*4)]);
-    printf("h_dA[%d]:%f\n", 2+32*(3+32*4), h_dA[2+32*(3+32*4)]);
-
-    float *B = 0;
-    const int ldb = 0;
-    const int ldc = 0;
-    
+    printf("h_dA[%d]:%f\n", 2+32*(3+32*4), h_dA[2+32*(3+32*4)]);   
 
     // Always use device 0
     cudaSetDevice(0);
@@ -81,16 +88,16 @@ int main(int argc, char* *argv){
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
     cudaFuncCachePreferL1: Prefer larger L1 cache and smaller shared memory
     */
-    //CHECK_CALL(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
+    //checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
 
     // Allocate device buffers
-    CHECK_CALL(cudaMalloc((void**)&d_dA, xyz_byetes));
-    CHECK_CALL(cudaMalloc((void**)&d_dB, xyz_byetes));
+    checkCuda(cudaMalloc((void**)&d_dA, xyz_byetes));
+    checkCuda(cudaMalloc((void**)&d_dB, xyz_byetes));
     
     // Copy to device
-    CHECK_CALL(cudaMemcpy(d_dA, h_dA, xyz_byetes, cudaMemcpyHostToDevice));
-    //CHECK_CALL(cudaMemcpy(d_dB, h_dB, xyz_byetes, cudaMemcpyHostToDevice));
-    CHECK_CALL(cudaMemcpy(d_dB, d_dA, xyz_byetes, cudaMemcpyDeviceToDevice));
+    checkCuda(cudaMemcpy(d_dA, h_dA, xyz_byetes, cudaMemcpyHostToDevice));
+    //checkCuda(cudaMemcpy(d_dB, h_dB, xyz_byetes, cudaMemcpyHostToDevice));
+    checkCuda(cudaMemcpy(d_dB, d_dA, xyz_byetes, cudaMemcpyDeviceToDevice));
     
     // Setup the kernel
     float* input = d_dA;
@@ -125,7 +132,7 @@ int main(int argc, char* *argv){
     printf("(GPU) %lf GFlop/s\n", gflops);
     
     // Copy the result to main memory
-    CHECK_CALL(cudaMemcpy(h_dB, input, xyz_byetes, cudaMemcpyDeviceToHost));
+    checkCuda(cudaMemcpy(h_dB, input, xyz_byetes, cudaMemcpyDeviceToHost));
     
     // Run the CPU version
     startTime = rtclock();
@@ -185,7 +192,7 @@ int main(int argc, char* *argv){
     free(h_dB);
     free(h_dA1);
     free(h_dB1);
-    CHECK_CALL(cudaFree(d_dA));
-    CHECK_CALL(cudaFree(d_dB));
+    checkCuda(cudaFree(d_dA));
+    checkCuda(cudaFree(d_dB));
 
 }
