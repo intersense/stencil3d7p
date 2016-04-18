@@ -133,7 +133,7 @@ __global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, 
     __syncthreads();
     d_out[CURRENT_G] = s_data[CURRENT_S];
   }
-  #pragma unroll 
+  //#pragma unroll 
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
