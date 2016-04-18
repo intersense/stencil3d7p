@@ -240,14 +240,6 @@ int main(int argc, char* *argv){
     printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
-
-    testIndex = 0;
-    printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
-    printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
-    printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
-    printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
-    printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
-    printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
     */
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
