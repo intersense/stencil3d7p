@@ -118,8 +118,8 @@ int main(int argc, char* *argv){
 
     checkCuda( cudaEventRecord(startEvent,0) );
     // Run the GPU kernel
-    for(int t = 0; t < timesteps; t += 1) {         
-        jacobi3d_7p_shmem_3d<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
+    for(int t = 0; t < timesteps; t += 2) {         
+        jacobi3d_7p_shmem_3d_temporal<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
         // swap input and output
         tmp = input;
         input =  output;
@@ -138,6 +138,7 @@ int main(int argc, char* *argv){
 
     
     // Copy the result to main memory
+
     if(timesteps%2==0)
         checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
     else

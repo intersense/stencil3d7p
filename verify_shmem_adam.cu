@@ -153,9 +153,9 @@ int main(int argc, char* *argv){
 
 
 
-    if(timesteps%2==0)
-        checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
-    else
+    //if(timesteps%2==0)
+        //checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
+    //else
         checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
 
     checkCuda( cudaEventRecord(stopEvent, 0));
@@ -182,9 +182,9 @@ int main(int argc, char* *argv){
         h_B1 = tmp1;
     }
     float *cpuResult;
-    if ((timesteps%2) == 0)
-        cpuResult = h_B1;
-    else
+    //if ((timesteps%2) == 0)
+    //    cpuResult = h_B1;
+    //else
         cpuResult = h_A1;
     /*float endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
