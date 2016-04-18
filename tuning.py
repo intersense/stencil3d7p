@@ -3,6 +3,10 @@
 import subprocess
 import sys
 
-
-proc = subprocess.Popen("./verify-adam.o 0 256 256 256 156 1 1", shell=True)
+test = input("Input the size of the stencil grid:")
+command = "./verify-adam.o "
+command += "0 "
+command += test + " " + test + " " + test + " "
+command += "1 1"
+proc = subprocess.Popen(command, shell=True)
 proc.wait()
