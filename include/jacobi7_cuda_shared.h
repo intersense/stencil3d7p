@@ -79,6 +79,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
 }
 
 // compute then store the result to shared memory, after all the data in shared memory updated, store to glmem
+// worse than no store cached in shared memory
 __global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
 {
   const int bx = blockDim.x;
