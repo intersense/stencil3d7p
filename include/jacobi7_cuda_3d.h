@@ -55,7 +55,7 @@ __global__ void jacobi3d_7p_shmem_3d(float *d_in, float *d_out, const int nx, co
   front = s_data[CURRENT_S - share_x * share_y];
   back  = s_data[CURRENT_S + share_x * share_y];
 
-  if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1 && iz >0 && iz < nz -1)
+  if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1 && iz > 0 && iz < nz -1)
   {
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;

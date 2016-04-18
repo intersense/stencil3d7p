@@ -41,7 +41,7 @@ verify-shmem:
 verify-shmem2:
 	nvcc verify_shmem2.cu -o verify-shmem2.o -I./include
 verify-shmem-3d:
-	nvcc verify_shmem_3d.cu -o verify-shmem_3d.o -I./include
+	nvcc verify_shmem_3d.cu -o verify-shmem-3d.o -I./include
 verify-overlap:
 	nvcc verify_overlap.cu -o verify-overlap.o -I./include
 verify-overlap-adam:

@@ -198,9 +198,6 @@ int main(int argc, char* *argv){
       printf("Correctness, PASSED\n");
     }
 
-    printf("cpuResult[%d]:%f\n", 2+ny*(3+nz*4), cpuResult[2+ny*(3+nz*4)]);
-    printf("gpuResult[%d]:%f\n", 2+ny*(3+nz*4), gpuResult[2+ny*(3+nz*4)]);
-
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
