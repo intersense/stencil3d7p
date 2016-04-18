@@ -3,7 +3,7 @@
 import subprocess
 import sys
 command = "make verify-adam"
-proc.subprocess.Popen(command, shell=True)
+proc = subprocess.Popen(command, shell=True)
 proc.wait()
 nx = input("Input the size of the stencil grid:")
 for bx in [nx/4, nx/2]:
