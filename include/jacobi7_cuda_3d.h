@@ -124,7 +124,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
 
   // back
   if (s_z == bz-1 && iz < nz-1)   s_data[CURRENT_S + share_x * share_y] = d_in[CURRENT_G + nx * ny];
-  if (s_z == bz-1 && iz <nz-2)    s_data[CURRENT_S + 2 * share_x * share_y] = d_in[CURRENT_G + 2 * nx * ny];
+  if (s_z == bz-1 && iz < nz-2)    s_data[CURRENT_S + 2 * share_x * share_y] = d_in[CURRENT_G + 2 * nx * ny];
 
   // top-left
   if (s_x == 0 && s_y == 0 && ix > 0 && iy > 0) s_data[CURRENT_S - share_x - 1] = d_in[CURRENT_G - nx - 1];
@@ -147,19 +147,17 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   if (s_x == bx-1 && s_y == by-1 && ix < nx-1 && iy < ny-2) s_data[CURRENT_S + 2*share_x + 1] = d_in[CURRENT_G + 2*nx + 1];
 
   __syncthreads();
-
-  // Load shared memory into registers
-  curr  = s_data[CURRENT_S];
-  right = s_data[CURRENT_S + 1];
-  left  = s_data[CURRENT_S - 1];
-  up    = s_data[CURRENT_S - share_x];
-  down  = s_data[CURRENT_S + share_x];
-  front = s_data[CURRENT_S - share_x * share_y];
-  back  = s_data[CURRENT_S + share_x * share_y];
-
   // the core thread block
   if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1 && iz > 0 && iz < nz -1)
   {
+    // Load shared memory into registers
+    curr  = s_data[CURRENT_S];
+    right = s_data[CURRENT_S + 1];
+    left  = s_data[CURRENT_S - 1];
+    up    = s_data[CURRENT_S - share_x];
+    down  = s_data[CURRENT_S + share_x];
+    front = s_data[CURRENT_S - share_x * share_y];
+    back  = s_data[CURRENT_S + share_x * share_y];
     s_data[CURRENT_S] = right + left + up + down + front + back - curr * fac;
     // left halo
     if (s_x == 0 && ix > 1){
@@ -173,7 +171,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
       s_data[CURRENT_S - 1] = right + left + up + down + front + back - curr * fac;
     }
     // right halo
-    if (s_x == bx-1){
+    if (s_x == bx-1 && ix < nx - 2){
       curr  = s_data[CURRENT_S + 1];
       right = s_data[CURRENT_S + 1 + 1];
       left  = s_data[CURRENT_S + 1 - 1];
@@ -184,7 +182,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
       s_data[CURRENT_S + 1] = right + left + up + down + front + back - curr * fac;
     }
     // top halo
-    if (s_y == 0){
+    if (s_y == 0 && iy > 1){
       curr  = s_data[CURRENT_S - share_x];
       right = s_data[CURRENT_S - share_x + 1];
       left  = s_data[CURRENT_S - share_x - 1];
@@ -195,7 +193,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
       s_data[CURRENT_S - share_x] = right + left + up + down + front + back - curr * fac;
     }
     // down halo
-    if (s_y == by-1){
+    if (s_y == by-1 && iy < ny - 2){
       curr  = s_data[CURRENT_S + share_x];
       right = s_data[CURRENT_S + share_x + 1];
       left  = s_data[CURRENT_S + share_x - 1];
@@ -206,7 +204,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
       s_data[CURRENT_S + share_x] = right + left + up + down + front + back - curr * fac;
     }
     // front halo
-    if (s_z == 0){
+    if (s_z == 0 && iz > 1){
       curr  = s_data[CURRENT_S - share_x*share_y];
       right = s_data[CURRENT_S - share_x*share_y + 1];
       left  = s_data[CURRENT_S - share_x*share_y - 1];
@@ -217,7 +215,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
       s_data[CURRENT_S - share_x*share_y] = right + left + up + down + front + back - curr * fac;
     }
     // back halo
-    if (s_z == bz-1){
+    if (s_z == bz-1 && iz < nz-2){
       curr  = s_data[CURRENT_S + share_x*share_y];
       right = s_data[CURRENT_S + share_x*share_y + 1];
       left  = s_data[CURRENT_S + share_x*share_y - 1];
