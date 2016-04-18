@@ -151,12 +151,7 @@ int main(int argc, char* *argv){
     double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
-
-
-    //if(timesteps%2==0)
-        //checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
-    //else
-        checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
+    checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
 
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
@@ -182,10 +177,8 @@ int main(int argc, char* *argv){
         h_B1 = tmp1;
     }
     float *cpuResult;
-    //if ((timesteps%2) == 0)
-    //    cpuResult = h_B1;
-    //else
-        cpuResult = h_A1;
+    cpuResult = h_A1;
+    
     /*float endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
 
