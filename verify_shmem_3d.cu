@@ -52,37 +52,36 @@ int main(int argc, char* *argv){
     const int xyz = nx * ny * nz;
     const int xyz_byetes = xyz * sizeof(float);
 
-    float *h_dA;
-    float *h_dB;
-    float *d_dA;
-    float *d_dB;
+    float *h_A;
+    float *h_B;
+    float *d_A;
+    float *d_B;
 
-    float *h_dA1;
-    float *h_dB1;
+    float *h_A1;
+    float *h_B1;
     
     // Allocate host buffers
-    h_dA = (float*) malloc(xyz_byetes);
-    h_dB = (float*) malloc(xyz_byetes);
-    h_dA1 = (float*) malloc(xyz_byetes);
-    h_dB1 = (float*) malloc(xyz_byetes);
+    checkCuda(cudaMallocHost((void**)&h_A, xyz_bytes)); // host pinned
+    checkCuda(cudaMallocHost((void**)&h_B, xyz_bytes));
+    
+    // for comparison btw CPU and GPU version
+    checkCuda(cudaMallocHost((void**)&h_A1, xyz_bytes));
+    checkCuda(cudaMallocHost((void**)&h_B1, xyz_bytes));
 
     // grid data iniatialization   
     // randomly generaed test data
     srand(time(NULL));
     int i = 0;
     for(; i < xyz; i++) {
-        h_dA[i] = 1 + (float)rand() / (float)RAND_MAX;
-        h_dB[i] =  h_dA[i];
-        h_dA1[i] = h_dA[i];
-        h_dB1[i] = h_dA[i];
+        h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
+        h_B[i] =  h_A[i];
+        h_A1[i] = h_A[i];
+        h_B1[i] = h_A[i];
     }
-    printf("Start computing...");
-    printf("h_dB[%d]:%f\n", 2+32*(3+32*4), h_dB[2+32*(3+32*4)]);
-    printf("h_dA[%d]:%f\n", 2+32*(3+32*4), h_dA[2+32*(3+32*4)]);   
 
     // Always use device 0
     cudaSetDevice(0);
-
+    printf("Start computing...");
     /* set the ratio of cache/shared memory
     cudaFuncCachePreferNone: Default function cache configuration, no preference
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
@@ -91,27 +90,33 @@ int main(int argc, char* *argv){
     //checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
 
     // Allocate device buffers
-    checkCuda(cudaMalloc((void**)&d_dA, xyz_byetes));
-    checkCuda(cudaMalloc((void**)&d_dB, xyz_byetes));
+    checkCuda(cudaMalloc((void**)&d_A, xyz_byetes));
+    checkCuda(cudaMalloc((void**)&d_B, xyz_byetes));
     
     // Copy to device
-    checkCuda(cudaMemcpy(d_dA, h_dA, xyz_byetes, cudaMemcpyHostToDevice));
-    //checkCuda(cudaMemcpy(d_dB, h_dB, xyz_byetes, cudaMemcpyHostToDevice));
-    checkCuda(cudaMemcpy(d_dB, d_dA, xyz_byetes, cudaMemcpyDeviceToDevice));
+    checkCuda(cudaMemcpy(d_A, h_A, xyz_byetes, cudaMemcpyHostToDevice));
+    checkCuda(cudaMemcpy(d_B, d_A, xyz_byetes, cudaMemcpyDeviceToDevice));
     
     // Setup the kernel
-    float* input = d_dA;
-    float* output = d_dB;
+    float* input = d_A;
+    float* output = d_B;
     dim3 grid(nx/tx, ny/ty, nz/tz);
     dim3 block(tx, ty, tz);
 
+    printf("grid:(%d, %d, %d)\n", grid.x, grid.y, grid.z);
+    printf("block:(%d, %d, %d)\n", tx, ty, tz);
     
     float *tmp;
     float *tmp1;
-    float fac = 6.0/(h_dA[0] * h_dA[0]);
+    float fac = 6.0/(h_A[0] * h_A[0]);
     const int sharedMemSize = (block.x + 2) * (block.y + 2) * (block.z + 2) * sizeof(float);
     printf("sharedMemSize:%d\n",sharedMemSize);
-    double startTime = rtclock();
+    float ms;
+    cudaEvent_t startEvent, stopEvent;
+    checkCuda( cudaEventCreate(&startEvent));
+    checkCuda( cudaEventCreate(&stopEvent));
+
+    checkCuda( cudaEventRecord(startEvent,0) );
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {         
         jacobi3d_7p_shmem_3d<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
@@ -120,30 +125,40 @@ int main(int argc, char* *argv){
         input =  output;
         output = tmp;
     }
-    
-    SYNC_DEVICE();
-    ASSERT_STATE("Kernel");
-    double endTime = rtclock();
-    double elapsedTimeG = endTime - startTime;
+    checkCuda( cudaEventRecord(stopEvent, 0));
+    checkCuda( cudaEventSynchronize(stopEvent));
+    checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
+    printf("Time of shared memory version (pure GPU) (ms): %f\n", ms1);
   
-    printf("Elapsed Time:%lf\n", elapsedTimeG);
-    double flops = xyz * 7.0 * timesteps;
-    double gflops = flops / elapsedTimeG / 1e9;
-    printf("(GPU) %lf GFlop/s\n", gflops);
+    double gflop = (xyz * 1e-9) * 7.0 * timesteps;
+    double gflop_per_sec = gflop * 1e3 / ms1;
+    printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
+    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1;
+    printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
+
     
     // Copy the result to main memory
-    checkCuda(cudaMemcpy(h_dB, input, xyz_byetes, cudaMemcpyDeviceToHost));
+    if(timesteps%2==0)
+        checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
+    else
+        checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
+    float *gpuResult = h_A;
     
     // Run the CPU version
     startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
-        tmp1 = h_dA1;
-        h_dA1 = h_dB1;
-        h_dB1 = tmp1;
+        jacobi7(nx, ny, nz, h_A1, h_B1, fac);
+        tmp1 = h_A1;
+        h_A1 = h_B1;
+        h_B1 = tmp1;
     }
     endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
+    float *cpuResult;
+    if ((timesteps%2) == 0)
+        cpuResult = h_B1;
+    else
+        cpuResult = h_A1;
 
     printf("Elapsed Time:%lf\n", elapsedTimeC);
     flops = xyz * 7.0 * timesteps;
@@ -155,12 +170,17 @@ int main(int argc, char* *argv){
     double errorNorm, refNorm, diff;
     errorNorm = 0.0;
     refNorm = 0.0;
+    i = 0;
     for (; i < xyz; ++i){
-        diff = h_dA1[i] - h_dB[i];
+        diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
-        refNorm += h_dA1[i] * h_dA1[i];
-        /*if (h_dB[i+nx*(j+ny*k)] != h_dA1[i+nx*(j+ny*k)])
-                   diff = 1;*/
+        refNorm += cpuResult[i] * cpuResult[i];
+        if (abs(diff)> 1e-4)
+        {
+            printf("GPU[%d]=%f\n", i, gpuResult[i]);
+            printf("CPU[%d]=%f\n", i, cpuResult[i]);
+        }
+
     }
     errorNorm = sqrt(errorNorm);
     refNorm   = sqrt(refNorm);
@@ -172,27 +192,27 @@ int main(int argc, char* *argv){
       printf("Correctness, FAILED\n");
     }
     else if((errorNorm / refNorm) > 1e-2) {
-      printf("Correct  ness, FAILED\n");
+      printf("Correctness, FAILED\n");
     }
     else {
       printf("Correctness, PASSED\n");
     }
 
-    printf("h_dB[%d]:%f\n", 2+ny*(3+nz*4), h_dB[2+ny*(3+nz*4)]);
-    printf("h_dA[%d]:%f\n", 2+ny*(3+nz*4), h_dA[2+ny*(3+nz*4)]);
-    printf("h_dB1[%d]:%f\n", 2+ny*(3+nz*4), h_dB1[2+ny*(3+nz*4)]);
-    printf("h_dA1[%d]:%f\n", 2+ny*(3+nz*4), h_dA1[2+ny*(3+nz*4)]);
+    printf("h_B[%d]:%f\n", 2+ny*(3+nz*4), h_B[2+ny*(3+nz*4)]);
+    printf("h_A[%d]:%f\n", 2+ny*(3+nz*4), h_A[2+ny*(3+nz*4)]);
+    printf("h_B1[%d]:%f\n", 2+ny*(3+nz*4), h_B1[2+ny*(3+nz*4)]);
+    printf("h_A1[%d]:%f\n", 2+ny*(3+nz*4), h_A1[2+ny*(3+nz*4)]);
     printf("-----------------------------------\n");
-    printf("h_dB[%d]:%f\n", 3+ny*(4+nz*5), h_dB[3+ny*(4+nz*5)]);
-    printf("h_dA[%d]:%f\n", 3+ny*(4+nz*5), h_dA[3+ny*(4+nz*5)]);
-    printf("h_dB1[%d]:%f\n", 3+ny*(4+nz*5), h_dB1[3+ny*(4+nz*5)]);
-    printf("h_dA1[%d]:%f\n", 3+ny*(4+nz*5), h_dA1[3+ny*(4+nz*5)]);
+    printf("h_B[%d]:%f\n", 3+ny*(4+nz*5), h_B[3+ny*(4+nz*5)]);
+    printf("h_A[%d]:%f\n", 3+ny*(4+nz*5), h_A[3+ny*(4+nz*5)]);
+    printf("h_B1[%d]:%f\n", 3+ny*(4+nz*5), h_B1[3+ny*(4+nz*5)]);
+    printf("h_A1[%d]:%f\n", 3+ny*(4+nz*5), h_A1[3+ny*(4+nz*5)]);
     // Free buffers
-    free(h_dA);
-    free(h_dB);
-    free(h_dA1);
-    free(h_dB1);
-    checkCuda(cudaFree(d_dA));
-    checkCuda(cudaFree(d_dB));
+    free(h_A);
+    free(h_B);
+    free(h_A1);
+    free(h_B1);
+    checkCuda(cudaFree(d_A));
+    checkCuda(cudaFree(d_B));
 
 }
