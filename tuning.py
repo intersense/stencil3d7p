@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+nx = 256
 for bx in [256, 128]:
     for by in [1, 2]:
         #nx = input("Input the size of the stencil grid:")
