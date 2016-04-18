@@ -52,7 +52,7 @@ int main(int argc, char* *argv){
     int devId = 0;
     cudaDeviceProp prop;
     checkCuda( cudaGetDeviceProperties(&prop, devId));
-    printf("Device : %s\n", prop.name);
+    //printf("Device : %s\n", prop.name);
     checkCuda( cudaSetDevice(devId));
     
     // Allocate host buffers
@@ -91,7 +91,7 @@ int main(int argc, char* *argv){
     printf("grid:(%d, %d)\n", grid.x, grid.y);
     printf("block:(%d, %d)\n", tx, ty);
     float ms, ms1; // elapsed time in milliseconds
-    printf("Start computing...\n");   
+    //printf("Start computing...\n");   
 
     /* set the ratio of cache/shared memory
     cudaFuncCachePreferNone: Default function cache configuration, no preference
@@ -134,7 +134,6 @@ int main(int argc, char* *argv){
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
         kernel<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
-        // swap input and output
         tmp = input;
         input =  output;
         output = tmp;
