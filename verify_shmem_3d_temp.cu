@@ -163,6 +163,7 @@ int main(int argc, char* *argv){
     double errorNorm, refNorm, diff;
     errorNorm = 0.0;
     refNorm = 0.0;
+    int errorCount=0;
     i = 0;
     for (; i < xyz; ++i){
         diff = cpuResult[i] - gpuResult[i];
@@ -170,8 +171,9 @@ int main(int argc, char* *argv){
         refNorm += cpuResult[i] * cpuResult[i];
         if (abs(diff)> 1e-4)
         {
-            printf("GPU[%d]=%f\n", i, gpuResult[i]);
-            printf("CPU[%d]=%f\n", i, cpuResult[i]);
+            //printf("GPU[%d]=%f\n", i, gpuResult[i]);
+            //printf("CPU[%d]=%f\n", i, cpuResult[i]);
+            errorCount++;
         }
 
     }
