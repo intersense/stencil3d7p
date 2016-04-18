@@ -107,7 +107,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
     s_data[C_S] = d_in[C_G - 1] + d_in[C_G + 1] + d_in[C_G - nx] + d_in[C_G + nx] + d_in[C_G - nx * ny] + d_in[C_G + nx * ny] - fac * d_in[C_G];
   }  
   
-  // Load halo region into shared memory
+  // compute halo region, and store into shared memory
   if(s_x == 1 && ix > 0) {
     // condition: C_G - 1 - 1, C_G - 1 + 1, C_G - 1 - nx, C_G - 1 + nx, C_G - 1 - nx * ny, C_G - 1 + nx * ny and C_G - 1
     if (boundary1){

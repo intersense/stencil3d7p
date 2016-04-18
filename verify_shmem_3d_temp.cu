@@ -114,7 +114,7 @@ int main(int argc, char* *argv){
     float *tmp;
     float *tmp1;
     float fac = 6.0/(h_A[0] * h_A[0]);
-    const int sharedMemSize = (tx + 4) * (ty + 4) * (tz + 4) * sizeof(float);
+    const int sharedMemSize = (tx + 2) * (ty + 2) * (tz + 2) * sizeof(float);
     printf("sharedMemSize:%d\n",sharedMemSize);
     float ms;
     cudaEvent_t startEvent, stopEvent;
