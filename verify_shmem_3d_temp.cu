@@ -171,8 +171,8 @@ int main(int argc, char* *argv){
         refNorm += cpuResult[i] * cpuResult[i];
         if (abs(diff)> 1e-4)
         {
-            printf("GPU[%d]=%f\n", i, gpuResult[i]);
-            printf("CPU[%d]=%f\n", i, cpuResult[i]);
+            //printf("GPU[%d]=%f\n", i, gpuResult[i]);
+            //printf("CPU[%d]=%f\n", i, cpuResult[i]);
             errorCount++;
         }
     }
@@ -192,7 +192,13 @@ int main(int argc, char* *argv){
     else {
       printf("Correctness, PASSED\n");
     }
-
+    int testIndex = 3 + 3*nx+ 3*nx*ny;
+    printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
+    printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
+    printf("h_dA[%d]=%f\n", testIndex, h_dA[testIndex]);
+    printf("h_dB[%d]=%f\n", testIndex, h_dB[testIndex]);
+    printf("h_dA1[%d]=%f\n", testIndex, h_dA1[testIndex]);
+    printf("h_dB1[%d]=%f\n", testIndex, h_dB1[testIndex]);
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
