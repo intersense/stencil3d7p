@@ -100,8 +100,8 @@ int main(int argc, char* *argv){
     // Setup the kernel
     float* input = d_A;
     float* output = d_B;
-    dim3 grid((nx+tx+1)/(tx+2), (ny+ty+1)/(ty+2), (nz+tz+1)/(tz+2));
-    dim3 block(tx+2, ty+2, tz+2);
+    dim3 grid((nx+tx-1)/tx, (ny+ty-1)/ty, (nz+tz-1)/tz);
+    dim3 block(tx, ty, tz);
 
     printf("grid:(%d, %d, %d)\n", grid.x, grid.y, grid.z);
     printf("block:(%d, %d, %d)\n", tx, ty, tz);
@@ -109,7 +109,7 @@ int main(int argc, char* *argv){
     float *tmp;
     float *tmp1;
     float fac = 6.0/(h_A[0] * h_A[0]);
-    const int sharedMemSize = (block.x + 2) * (block.y + 2) * (block.z + 2) * sizeof(float);
+    const int sharedMemSize = (block.x + 4) * (block.y + 4) * (block.z + 4) * sizeof(float);
     printf("sharedMemSize:%d\n",sharedMemSize);
     float ms;
     cudaEvent_t startEvent, stopEvent;
