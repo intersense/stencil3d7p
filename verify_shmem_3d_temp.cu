@@ -18,12 +18,12 @@
 inline
 cudaError_t checkCuda(cudaError_t result)
 {
-#if defined(DEBUG) || defined(_DEBUG)
+//#if defined(DEBUG) || defined(_DEBUG)
   if (result != cudaSuccess) {
     fprintf(stderr, "CUDA Runtime Error: %s\n", cudaGetErrorString(result));
     assert(result == cudaSuccess);
   }
-#endif
+//#endif
   return result;
 }
 
@@ -85,7 +85,7 @@ int main(int argc, char* *argv){
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
     // Always use device 0
     cudaSetDevice(0);
-    printf("Start computing...");
+    printf("Start computing...\n");
     /* set the ratio of cache/shared memory
     cudaFuncCachePreferNone: Default function cache configuration, no preference
     cudaFuncCachePreferShared: Prefer larger shared memory and smaller L1 cache
@@ -113,14 +113,14 @@ int main(int argc, char* *argv){
     float *tmp;
     float *tmp1;
     float fac = 6.0/(h_A[0] * h_A[0]);
-    const int sharedMemSize = (block.x + 4) * (block.y + 4) * (block.z + 4) * sizeof(float);
+    const int sharedMemSize = (tx + 4) * (ty + 4) * (tz + 4) * sizeof(float);
     printf("sharedMemSize:%d\n",sharedMemSize);
     float ms;
     cudaEvent_t startEvent, stopEvent;
-    checkCuda( cudaEventCreate(&startEvent));
-    checkCuda( cudaEventCreate(&stopEvent));
+    checkCuda(cudaEventCreate(&startEvent));
+    checkCuda(cudaEventCreate(&stopEvent));
 
-    checkCuda( cudaEventRecord(startEvent,0) );
+    checkCuda(cudaEventRecord(startEvent,0) );
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 2) {         
         jacobi3d_7p_shmem_3d_temporal<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
