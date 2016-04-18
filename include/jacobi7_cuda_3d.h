@@ -196,7 +196,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
     s_data[CURRENT_S - share_x] = right + left + up + down + front + back - curr * fac;
   }
   // down halo
-  if (s_y = by-1){
+  if (s_y == by-1){
     curr  = s_data[CURRENT_S + share_x];
     right = s_data[CURRENT_S + share_x + 1];
     left  = s_data[CURRENT_S + share_x - 1];
