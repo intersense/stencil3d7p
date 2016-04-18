@@ -219,14 +219,14 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   }
   // back halo
   if (s_z == bz-1){
-    curr  = s_data[CURRENT_S + share_x];
-    right = s_data[CURRENT_S + share_x + 1];
-    left  = s_data[CURRENT_S + share_x - 1];
-    up    = s_data[CURRENT_S + share_x - share_x];
-    down  = s_data[CURRENT_S + share_x + share_x];
-    front = s_data[CURRENT_S + share_x - share_x * share_y];
-    back  = s_data[CURRENT_S + share_x + share_x * share_y];
-    s_data[CURRENT_S + share_x] = right + left + up + down + front + back - curr * fac;
+    curr  = s_data[CURRENT_S + share_x*share_y];
+    right = s_data[CURRENT_S + share_x*share_y + 1];
+    left  = s_data[CURRENT_S + share_x*share_y - 1];
+    up    = s_data[CURRENT_S + share_x*share_y - share_x];
+    down  = s_data[CURRENT_S + share_x*share_y + share_x];
+    front = s_data[CURRENT_S + share_x*share_y - share_x * share_y];
+    back  = s_data[CURRENT_S + share_x*share_y + share_x * share_y];
+    s_data[CURRENT_S + share_x*share_y] = right + left + up + down + front + back - curr * fac;
   }
 
   __syncthreads();
