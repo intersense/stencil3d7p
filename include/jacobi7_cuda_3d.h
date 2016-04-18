@@ -103,7 +103,8 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   bool boundary2 = ix > 0 && ix < nx-1 && iy > 0 && iy < ny - 1 && iz > 0 && iz < nz - 1;
   // Load c, front, and back nodes into shared and register memory
   if (boundary1){
-    curr  = s_data[C_S] = d_in[C_G];
+    //curr  = s_data[C_S] = d_in[C_G];
+    s_data[C_S] = d_in[C_G - 1] + d_in[C_G + 1] + d_in[C_G - nx] + d_in[C_G + nx] + d_in[C_G - nx * ny] + d_in[C_G + nx * ny] - fac * d_in[C_G];
   }  
   
   // Load halo region into shared memory
