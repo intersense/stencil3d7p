@@ -7,6 +7,7 @@
 #include "getopt.h"
 #include "jacobi7_cuda_3d.h"
 #include "jacobi7.h"
+#include <assert.h>
 
 //#ifndef TIME_TILE_SIZE
 //#warning TIME_TILE_SIZE is not set, defaulting to 1
