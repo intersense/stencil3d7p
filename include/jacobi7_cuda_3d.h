@@ -140,17 +140,16 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   }
   __syncthreads();
 
-  // Load shared memory into registers
-  curr  = s_data[C_S];
-  right = s_data[C_S + 1];
-  left  = s_data[C_S - 1];
-  up    = s_data[C_S - share_x];
-  down  = s_data[C_S + share_x];
-  front = s_data[C_S - share_x * share_y];
-  back  = s_data[C_S + share_x * share_y];
-
   if(boundary2)
   {
+      // Load shared memory into registers
+    curr  = s_data[C_S];
+    right = s_data[C_S + 1];
+    left  = s_data[C_S - 1];
+    up    = s_data[C_S - share_x];
+    down  = s_data[C_S + share_x];
+    front = s_data[C_S - share_x * share_y];
+    back  = s_data[C_S + share_x * share_y];
     temp = right + left + up + down + front + back - curr * fac;
     d_out[C_G] = temp;
   }
