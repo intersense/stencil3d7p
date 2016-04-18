@@ -126,7 +126,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   __syncthreads();
 
   // 2
-  if (s_x >= 1 && s_x <= bx && s_y >= 1 && s_y <= by && s_z >= 1 && s_z <= bz)
+  if (s_x >= 1 && s_x <= bx && s_y >= 1 && s_y <= by && s_z >= 1 && s_z <= bz && ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1 && iz > 0 && iz < nz -1)
   {
     curr  = s_data[CURRENT_S];
     right = s_data[CURRENT_S + 1];
