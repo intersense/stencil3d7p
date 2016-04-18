@@ -198,15 +198,8 @@ int main(int argc, char* *argv){
       printf("Correctness, PASSED\n");
     }
 
-    printf("h_B[%d]:%f\n", 2+ny*(3+nz*4), h_B[2+ny*(3+nz*4)]);
-    printf("h_A[%d]:%f\n", 2+ny*(3+nz*4), h_A[2+ny*(3+nz*4)]);
-    printf("h_B1[%d]:%f\n", 2+ny*(3+nz*4), h_B1[2+ny*(3+nz*4)]);
-    printf("h_A1[%d]:%f\n", 2+ny*(3+nz*4), h_A1[2+ny*(3+nz*4)]);
-    printf("-----------------------------------\n");
-    printf("h_B[%d]:%f\n", 3+ny*(4+nz*5), h_B[3+ny*(4+nz*5)]);
-    printf("h_A[%d]:%f\n", 3+ny*(4+nz*5), h_A[3+ny*(4+nz*5)]);
-    printf("h_B1[%d]:%f\n", 3+ny*(4+nz*5), h_B1[3+ny*(4+nz*5)]);
-    printf("h_A1[%d]:%f\n", 3+ny*(4+nz*5), h_A1[3+ny*(4+nz*5)]);
+    printf("cpuResult[%d]:%f\n", 2+ny*(3+nz*4), cpuResult[2+ny*(3+nz*4)]);
+    printf("gpuResult[%d]:%f\n", 2+ny*(3+nz*4), gpuResult[2+ny*(3+nz*4)]);
 
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
