@@ -99,10 +99,10 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
 
   float temp;
 
-  bool boundary1 = ix > 1 && ix < nx-2 && iy > 1 && iy < ny - 2 && iz > 1 && iz < nz - 2;
-  bool boundary2 = ix > 0 && ix < nx-1 && iy > 0 && iy < ny - 1 && iz > 0 && iz < nz - 1;
+  bool boundary1 = ix > 1 && ix < nx - 2 && iy > 1 && iy < ny - 2 && iz > 1 && iz < nz - 2;
+  bool boundary2 = ix > 0 && ix < nx - 1 && iy > 0 && iy < ny - 1 && iz > 0 && iz < nz - 1;
   // Load c, front, and back nodes into shared and register memory
-  if (boundary1){
+  if (boundary2){
     //curr  = s_data[C_S] = d_in[C_G];
     s_data[C_S] = d_in[C_G - 1] + d_in[C_G + 1] + d_in[C_G - nx] + d_in[C_G + nx] + d_in[C_G - nx * ny] + d_in[C_G + nx * ny] - fac * d_in[C_G];
   }  
