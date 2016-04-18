@@ -6,7 +6,22 @@
 // refer benchmarks
 // time tile is 2
 
-__global__ void jacobi3d_7p_temporal(const float * f1, float * f2, int nx, int ny, int nz, float fac)
+__global__ void jacobi3d_7p_temporal_reg(const float * f1, float * f2, int nx, int ny, int nz, float fac)
+{
+  const int bx = blockDim.x;
+  const int by = blockDim.y;
+  const int ix = threadIdx.x + blockIdx.x * blockDim.x;
+  const int iy = threadIdx.y + blockIdx.y * blockDim.y;
+
+  const int tx = threadIdx.x;
+  const int ty = threadIdx.y;
+
+
+}
+
+
+
+__global__ void jacobi3d_7p_temporal_old(const float * f1, float * f2, int nx, int ny, int nz, float fac)
 {
   int c, sc;
   int c2, sc2;

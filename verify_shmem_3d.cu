@@ -8,7 +8,7 @@
 #include <math.h>
 #include "getopt.h"
 #include "jacobi7_cuda_3d.h"
-#include "include/jacobi7.h"
+#include "jacobi7.h"
 
 //#ifndef TIME_TILE_SIZE
 //#warning TIME_TILE_SIZE is not set, defaulting to 1
@@ -130,7 +130,7 @@ int main(int argc, char* *argv){
     // Run the CPU version
     startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi7(nx, ny, nz, h_dA1, B, ldb, h_dB1, ldc);
+        jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
         tmp1 = h_dA1;
         h_dA1 = h_dB1;
         h_dB1 = tmp1;
