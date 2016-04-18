@@ -80,9 +80,9 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   const int iz = threadIdx.z + blockIdx.z * bz;
 
   // grid points to be computed, dimensions
-  const int s_x = threadIdx.x + 1;
-  const int s_y = threadIdx.y + 1;
-  const int s_z = threadIdx.z + 1;
+  const int s_x = threadIdx.x;
+  const int s_y = threadIdx.y;
+  const int s_z = threadIdx.z;
 
   int CURRENT_G = ix + nx * (iy + ny * iz);
   int CURRENT_S = s_x + share_x * (s_y + share_y * s_z);
@@ -100,14 +100,14 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   // Load current, front, and back nodes into shared and register memory
   curr  = s_data[CURRENT_S] = d_in[CURRENT_G];
  
-
+  // 1
   // Load halo region into shared memory
-  if(s_x == 1 && ix > 0)              s_data[CURRENT_S - 1]  = d_in[CURRENT_G - 1];
-  if(s_x == share_x-2 && ix < nx-1)   s_data[CURRENT_S + 1]  = d_in[CURRENT_G + 1];
-  if(s_y == 1 && iy > 0)              s_data[CURRENT_S - share_x] = d_in[CURRENT_G - nx];
-  if(s_y == share_y-2 && iy < ny-1)   s_data[CURRENT_S + share_x] = d_in[CURRENT_G + nx];
-  if(s_z == 1 && iz >0)               s_data[CURRENT_S - share_x * share_y] = d_in[CURRENT_G - nx * ny];
-  if(s_z == share_z-2 && iz < nz-1)   s_data[CURRENT_S + share_x * share_y] = d_in[CURRENT_G + nx * ny];
+  if(s_x == 0 && ix > 0)         s_data[CURRENT_S - 1]  = d_in[CURRENT_G - 1];
+  if(s_x == bx+1 && ix < nx-1)   s_data[CURRENT_S + 1]  = d_in[CURRENT_G + 1];
+  if(s_y == 0 && iy > 0)         s_data[CURRENT_S - share_x] = d_in[CURRENT_G - nx];
+  if(s_y == by+1 && iy < ny-1)   s_data[CURRENT_S + share_x] = d_in[CURRENT_G + nx];
+  if(s_z == 0 && iz >0)          s_data[CURRENT_S - share_x * share_y] = d_in[CURRENT_G - nx * ny];
+  if(s_z == bz+1 && iz < nz-1)   s_data[CURRENT_S + share_x * share_y] = d_in[CURRENT_G + nx * ny];
   __syncthreads();
 
   // Load shared memory into registers
@@ -121,7 +121,28 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
 
   if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1 && iz > 0 && iz < nz -1)
   {
+    s_data[CURRENT_S] = right + left + up + down + front + back - curr * fac;
+  }
+  __syncthreads();
+
+  // 2
+  if (s_x >= 1 && s_x <= bx && s_y >= 1 && s_y <= bx && s_z >= 1 && s_z <= bz)
+  {
+    curr  = s_data[CURRENT_S];
+    right = s_data[CURRENT_S + 1];
+    left  = s_data[CURRENT_S - 1];
+    up    = s_data[CURRENT_S - share_x];
+    down  = s_data[CURRENT_S + share_x];
+    front = s_data[CURRENT_S - share_x * share_y];
+    back  = s_data[CURRENT_S + share_x * share_y]; 
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
   }
+
+
+  /*if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1 && iz > 0 && iz < nz -1)
+  {
+    temp = right + left + up + down + front + back - curr * fac;
+    d_out[CURRENT_G] = temp;
+  }*/
 }
