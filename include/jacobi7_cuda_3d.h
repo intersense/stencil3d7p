@@ -129,7 +129,7 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   // top-left
   if (s_x == 0 && s_y == 0 && ix > 0 && iy > 0) s_data[CURRENT_S - share_x - 1] = d_in[CURRENT_G - nx - 1];
   if (s_x == 0 && s_y == 0 && ix > 1 && iy > 0) s_data[CURRENT_S - share_x - 2] = d_in[CURRENT_G - nx - 2];
-  if (s_x == 0 && s_y == 0 && ix > 0 && iy > 1) s_data [CURRENT_S - 2 * share_x - 1]] = d_in[CURRENT_S - 2 * nx -1];
+  if (s_x == 0 && s_y == 0 && ix > 0 && iy > 1) s_data [CURRENT_S - 2 * share_x - 1] = d_in[CURRENT_S - 2 * nx -1];
 
   // top-right
   if (s_x == bx-1 && s_y == 0 && ix < nx-1 && iy > 0) s_data[CURRENT_S - share_x + 1] = d_in[CURRENT_G - nx + 1];
