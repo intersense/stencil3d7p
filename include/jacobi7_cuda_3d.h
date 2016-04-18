@@ -70,9 +70,9 @@ __global__ void jacobi3d_7p_shmem_3d_temporal(float *d_in, float *d_out, const i
   const int bz = blockDim.z;
 
   //shared memory dimension
-  const int share_x = bx + 2;
-  const int share_y = by + 2;
-  const int share_z = bz + 2;
+  const int share_x = bx + 4;
+  const int share_y = by + 4;
+  const int share_z = bz + 4;
 
   // thread global dimension
   const int ix = threadIdx.x + blockIdx.x * bx;
