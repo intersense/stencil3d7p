@@ -145,26 +145,26 @@ int main(int argc, char* *argv){
     float *gpuResult = h_A;
     
     // Run the CPU version
-    double startTime = rtclock();
+    //double startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
         jacobi7(nx, ny, nz, h_A1, h_B1, fac);
         tmp1 = h_A1;
         h_A1 = h_B1;
         h_B1 = tmp1;
     }
-    double endTime = rtclock();
-    double elapsedTimeC = endTime - startTime;
+    //double endTime = rtclock();
+    //double elapsedTimeC = endTime - startTime;
     float *cpuResult;
     if ((timesteps%2) == 0)
         cpuResult = h_B1;
     else
         cpuResult = h_A1;
 
-    printf("Elapsed Time:%lf\n", elapsedTimeC);
+    /*printf("Elapsed Time:%lf\n", elapsedTimeC);
     double flops = xyz * 7.0 * timesteps;
     double gflops = flops / elapsedTimeC / 1e9;
-    printf("(CPU) %lf GFlop/s\n", gflops);
-
+    printf("(CPU) %lf GFlop/s\n", gflops);*/
+    
 
     // compare the results btw CPU and GPU version
     double errorNorm, refNorm, diff;
@@ -207,12 +207,16 @@ int main(int argc, char* *argv){
     printf("h_A[%d]:%f\n", 3+ny*(4+nz*5), h_A[3+ny*(4+nz*5)]);
     printf("h_B1[%d]:%f\n", 3+ny*(4+nz*5), h_B1[3+ny*(4+nz*5)]);
     printf("h_A1[%d]:%f\n", 3+ny*(4+nz*5), h_A1[3+ny*(4+nz*5)]);
-    // Free buffers
-    free(h_A);
-    free(h_B);
-    free(h_A1);
-    free(h_B1);
-    checkCuda(cudaFree(d_A));
-    checkCuda(cudaFree(d_B));
 
+    // cleanup
+    checkCuda( cudaEventDestroy(startEvent));
+    checkCuda( cudaEventDestroy(stopEvent));
+    cudaFreeHost(h_A);
+    cudaFreeHost(h_B);
+    cudaFreeHost(h_A1);
+    cudaFreeHost(h_B1);
+    cudaFree(d_A);
+    cudaFree(d_B);
+
+    return 0;
 }
