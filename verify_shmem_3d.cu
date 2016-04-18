@@ -138,10 +138,7 @@ int main(int argc, char* *argv){
 
     
     // Copy the result to main memory
-    if(timesteps%2==0)
-        checkCuda( cudaMemcpy(h_A, output, xyz_bytes, cudaMemcpyDeviceToHost));
-    else
-        checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
+    checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
     float *gpuResult = h_A;
     
     // Run the CPU version
@@ -154,11 +151,7 @@ int main(int argc, char* *argv){
     }
     //double endTime = rtclock();
     //double elapsedTimeC = endTime - startTime;
-    float *cpuResult;
-    if ((timesteps%2) == 0)
-        cpuResult = h_B1;
-    else
-        cpuResult = h_A1;
+    float *cpuResult = h_A1;
 
     /*printf("Elapsed Time:%lf\n", elapsedTimeC);
     double flops = xyz * 7.0 * timesteps;
