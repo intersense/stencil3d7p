@@ -109,13 +109,13 @@ int main(int argc, char* *argv){
     // create events and streams
     cudaEvent_t startEvent, stopEvent, startEvent1, stopEvent1;
     
-    checkCuda( cudaEventCreate(&startEvent) );
-    checkCuda( cudaEventCreate(&stopEvent) );
+    checkCuda( cudaEventCreate(&startEvent));
+    checkCuda( cudaEventCreate(&stopEvent));
     checkCuda( cudaEventCreate(&startEvent1));
     checkCuda( cudaEventCreate(&stopEvent1));
 
     // timing start include data transfer and memory allocation
-    checkCuda( cudaEventRecord(startEvent,0) );
+    checkCuda( cudaEventRecord(startEvent,0));
     
     // Allocate device buffers
     checkCuda(cudaMalloc((void**)&d_A, xyz_bytes)); // device

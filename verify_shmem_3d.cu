@@ -50,7 +50,7 @@ int main(int argc, char* *argv){
     const int timesteps = atoi(argv[7]);
     
     const int xyz = nx * ny * nz;
-    const int xyz_byetes = xyz * sizeof(float);
+    const int xyz_bytes = xyz * sizeof(float);
 
     float *h_A;
     float *h_B;
@@ -145,14 +145,14 @@ int main(int argc, char* *argv){
     float *gpuResult = h_A;
     
     // Run the CPU version
-    startTime = rtclock();
+    double startTime = rtclock();
     for(int t = 0; t < timesteps; t += 1) {
         jacobi7(nx, ny, nz, h_A1, h_B1, fac);
         tmp1 = h_A1;
         h_A1 = h_B1;
         h_B1 = tmp1;
     }
-    endTime = rtclock();
+    double endTime = rtclock();
     double elapsedTimeC = endTime - startTime;
     float *cpuResult;
     if ((timesteps%2) == 0)
@@ -161,8 +161,8 @@ int main(int argc, char* *argv){
         cpuResult = h_A1;
 
     printf("Elapsed Time:%lf\n", elapsedTimeC);
-    flops = xyz * 7.0 * timesteps;
-    gflops = flops / elapsedTimeC / 1e9;
+    double flops = xyz * 7.0 * timesteps;
+    double gflops = flops / elapsedTimeC / 1e9;
     printf("(CPU) %lf GFlop/s\n", gflops);
 
 
