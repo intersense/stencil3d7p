@@ -131,9 +131,9 @@ int main(int argc, char* *argv){
     printf("Time of shared memory version (pure GPU) (ms): %f\n", ms);
   
     double gflop = (xyz * 1e-9) * 7.0 * timesteps;
-    double gflop_per_sec = gflop * 1e3 / ms1;
+    double gflop_per_sec = gflop * 1e3 / ms;
     printf("(GPU) %lf GFlop/s\n", gflop_per_sec);
-    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1;
+    double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
     
