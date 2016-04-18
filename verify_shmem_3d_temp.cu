@@ -78,7 +78,11 @@ int main(int argc, char* *argv){
         h_A1[i] = h_A[i];
         h_B1[i] = h_A[i];
     }
-
+    int testIndex = 3 + 3*nx+ 3*nx*ny;
+    printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
+    printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
+    printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
+    printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
     // Always use device 0
     cudaSetDevice(0);
     printf("Start computing...");
@@ -192,7 +196,7 @@ int main(int argc, char* *argv){
     else {
       printf("Correctness, PASSED\n");
     }
-    int testIndex = 3 + 3*nx+ 3*nx*ny;
+    testIndex = 3 + 3*nx+ 3*nx*ny;
     printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
     printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
     printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
