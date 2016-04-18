@@ -175,8 +175,8 @@ int main(int argc, char* *argv){
             //printf("CPU[%d]=%f\n", i, cpuResult[i]);
             errorCount++;
         }
-
     }
+    printf("errorCount:%d", errorCount);
     errorNorm = sqrt(errorNorm);
     refNorm   = sqrt(refNorm);
 
