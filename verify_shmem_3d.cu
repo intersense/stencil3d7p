@@ -90,12 +90,12 @@ int main(int argc, char* *argv){
     //checkCuda(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
 
     // Allocate device buffers
-    checkCuda(cudaMalloc((void**)&d_A, xyz_byetes));
-    checkCuda(cudaMalloc((void**)&d_B, xyz_byetes));
+    checkCuda(cudaMalloc((void**)&d_A, xyz_bytes));
+    checkCuda(cudaMalloc((void**)&d_B, xyz_bytes));
     
     // Copy to device
-    checkCuda(cudaMemcpy(d_A, h_A, xyz_byetes, cudaMemcpyHostToDevice));
-    checkCuda(cudaMemcpy(d_B, d_A, xyz_byetes, cudaMemcpyDeviceToDevice));
+    checkCuda(cudaMemcpy(d_A, h_A, xyz_bytes, cudaMemcpyHostToDevice));
+    checkCuda(cudaMemcpy(d_B, d_A, xyz_bytes, cudaMemcpyDeviceToDevice));
     
     // Setup the kernel
     float* input = d_A;
@@ -128,7 +128,7 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
-    printf("Time of shared memory version (pure GPU) (ms): %f\n", ms1);
+    printf("Time of shared memory version (pure GPU) (ms): %f\n", ms);
   
     double gflop = (xyz * 1e-9) * 7.0 * timesteps;
     double gflop_per_sec = gflop * 1e3 / ms1;
