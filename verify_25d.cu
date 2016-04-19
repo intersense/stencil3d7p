@@ -2,7 +2,7 @@
 #include <cuda.h>
 #include <stdio.h>
 #include <math.h>
-#include <jacobi7_cuda_shared.h>
+#include <jacobi7_cuda_temporal.h>
 #include <jacobi7.h>
 
 // Convenience function for checking CUDA runtime API results
@@ -81,7 +81,7 @@ int main(int argc, char* *argv){
 
     printf("grid:(%d, %d)\n", grid.x, grid.y);
     printf("block:(%d, %d)\n", tx, ty);
-    float ms; // elapsed time in milliseconds
+    float ms, ms1; // elapsed time in milliseconds
     //printf("Start computing...\n");   
 
     /* set the ratio of cache/shared memory
