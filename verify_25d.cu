@@ -217,7 +217,7 @@ int main(int argc, char* *argv){
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
     */
-    testIndex = 2 + 2*nx+ 2*nx*ny;
+    int testIndex = 2 + 2*nx+ 2*nx*ny;
     printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
     printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
     printf("h_A[%d]=%f\n", testIndex, h_A[testIndex]);
