@@ -142,11 +142,11 @@ int main(int argc, char* *argv){
     double mupdate_per_sec = ((xyz >> 20) * timesteps) * 1e3 / ms1;
     printf("(GPU) %lf M updates/s\n", mupdate_per_sec);
 
-    checkCuda( cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
+    checkCuda(cudaMemcpy(h_A, input, xyz_bytes, cudaMemcpyDeviceToHost));
 
-    checkCuda( cudaEventRecord(stopEvent, 0));
-    checkCuda( cudaEventSynchronize(stopEvent));
-    checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
+    checkCuda(cudaEventRecord(stopEvent, 0));
+    checkCuda(cudaEventSynchronize(stopEvent));
+    checkCuda(cudaEventElapsedTime(&ms, startEvent, stopEvent));
     float *gpuResult = h_A;
 
     printf("Time of shared memory version (ms): %f\n", ms);
@@ -188,11 +188,11 @@ int main(int argc, char* *argv){
         diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
         refNorm += cpuResult[i] * cpuResult[i];
-        if (abs(diff)> 1e-4)
+        /*if (abs(diff)> 1e-4)
         {
             printf("GPU[%d]=%f\n", i, gpuResult[i]);
             printf("CPU[%d]=%f\n", i, cpuResult[i]);
-        }
+        }*/
 
     }
     errorNorm = sqrt(errorNorm);
@@ -216,7 +216,7 @@ int main(int argc, char* *argv){
     printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
-    
+    */
     testIndex = 2 + 2*nx+ 2*nx*ny;
     printf("GPU[%d]=%f\n", testIndex, gpuResult[testIndex]);
     printf("CPU[%d]=%f\n", testIndex, cpuResult[testIndex]);
@@ -224,7 +224,7 @@ int main(int argc, char* *argv){
     printf("h_B[%d]=%f\n", testIndex, h_B[testIndex]);
     printf("h_A1[%d]=%f\n", testIndex, h_A1[testIndex]);
     printf("h_B1[%d]=%f\n", testIndex, h_B1[testIndex]);
-    */
+    
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
