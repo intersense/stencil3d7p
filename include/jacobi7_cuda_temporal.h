@@ -21,8 +21,8 @@ __global__ void jacobi3d_7p_25d(float * d_in, float * d_out, const int nx, const
   const int y_s = by + 2;
 
   int k = 1;
-  int CURRENT_G = ix + iy*nx + nx*ny;
-  int CURRENT_S = tx + ty * x_s;
+  int C_G = ix + iy*nx + nx*ny;
+  int C_S = tx + ty * x_s;
   extern __shared__ float s_data[];
   
   float *k_0 = s_data; // back plane
