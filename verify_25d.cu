@@ -228,6 +228,9 @@ int main(int argc, char* *argv){
     // cleanup
     checkCuda( cudaEventDestroy(startEvent));
     checkCuda( cudaEventDestroy(stopEvent));
+    checkCuda( cudaEventDestroy(startEvent1));
+    checkCuda( cudaEventDestroy(stopEvent1));
+
     cudaFreeHost(h_A);
     cudaFreeHost(h_B);
     cudaFreeHost(h_A1);
