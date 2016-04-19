@@ -46,7 +46,7 @@ __global__ void jacobi3d_7p_25d(float * d_in, float * d_out, const int nx, const
   // 1 
   // k_0 and k_2 need no halo
   // compute k_0 and store in k_0
-  if (boundary_c && boundary_k){
+  if (boundary_c){
     int C_G_0 = C_G - nx * ny;
     k_0[C_S] = d_in[C_G_0];
 
@@ -120,7 +120,7 @@ __global__ void jacobi3d_7p_25d(float * d_in, float * d_out, const int nx, const
   __syncthreads();
 
   // 2
-  if (boundary_c && boundary_k){
+  if (boundary_c){
     d_out[C_G] = k_1[C_S - 1] + k_1[C_S + 1] + k_1[C_S - x_s] + k_1[C_S + x_s] + k_0[C_S] + k_2[C_S] - fac * k_1[C_S];
   }
 
@@ -140,7 +140,7 @@ just like the data reuse in shared version (non-temporal)
     k_0 = k_1;
     k_1 = k_2;
     // 1: compute k2 and its halo
-    if (boundary_c && boundary_k){
+    if (boundary_c){
       int C_G_2 = C_G + nx * ny;
       k_2[C_S] = d_in[C_G_2 - 1] + d_in[C_G_2 + 1] + d_in[C_G_2 - nx] + d_in[C_G_2 + nx] + d_in[C_G_2 - nx * ny] + d_in[C_G_2 + nx * ny] - fac * d_in[C_G_2];
       
@@ -177,7 +177,7 @@ just like the data reuse in shared version (non-temporal)
     __syncthreads();
 
     // 2
-    if (boundary_c && boundary_k){
+    if (boundary_c){
       d_out[C_G] = k_1[C_S - 1] + k_1[C_S + 1] + k_1[C_S - x_s] + k_1[C_S + x_s] + k_0[C_S] + k_2[C_S] - fac * k_1[C_S];
     }
   } // end for (k)
