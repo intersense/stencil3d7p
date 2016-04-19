@@ -116,11 +116,8 @@ __global__ void jacobi3d_7p_25d(float * d_in, float * d_out, const int nx, const
     }else{
       k_2[C_S + x_s] = d_in[C_G_2 + nx];
     }
-  }
-  __syncthreads();
-
-  // 2
-  if (boundary_c){
+    __syncthreads();
+    // 2
     d_out[C_G] = k_1[C_S - 1] + k_1[C_S + 1] + k_1[C_S - x_s] + k_1[C_S + x_s] + k_0[C_S] + k_2[C_S] - fac * k_1[C_S];
   }
 
@@ -173,13 +170,10 @@ just like the data reuse in shared version (non-temporal)
       }else{
         k_2[C_S + x_s] = d_in[C_G_2 + nx];
       }
-    }
-    __syncthreads();
+      __syncthreads();
 
-    // 2
-    if (boundary_c){
+      // 2
       d_out[C_G] = k_1[C_S - 1] + k_1[C_S + 1] + k_1[C_S - x_s] + k_1[C_S + x_s] + k_0[C_S] + k_2[C_S] - fac * k_1[C_S];
-    }
   } // end for (k)
 }
 
