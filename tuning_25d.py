@@ -15,6 +15,6 @@ for bx in [nx/4, nx/2, nx]:
             command = "./verify-25d.o "
             command += str(nx) + " " + str(nx) + " " + str(nx) + " "
             command += str(bx) + " " + str(by) + " "
-            command += "1"
+            command += "2"
             proc = subprocess.Popen(command, shell=True)
             proc.wait()
