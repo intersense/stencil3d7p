@@ -59,8 +59,7 @@ int main(int argc, char* *argv){
     srand(time(NULL));
     int i = 0;
     for(; i < xyz; i++) {
-        h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
-        h_A1[i] = h_B1[i] = h_B[i] =  h_A[i];
+        h_A1[i] = h_B1[i] = h_B[i] = h_A[i] = 1 + (float)rand() / (float)RAND_MAX;
     }
     
     // A simple comparison of the result
