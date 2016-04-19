@@ -123,7 +123,7 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventRecord(startEvent1, 0));
 
     // Run the GPU kernel
-    for(int t = 0; t < timesteps; t += 1) {
+    for(int t = 0; t < timesteps; t += 2) {
         jacobi3d_7p_25d<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
         tmp = input;
         input =  output;

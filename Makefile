@@ -21,8 +21,8 @@ verify-adam-reg:
 verify-adam-reg-prefer-L1:
 	#nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -maxrregcount 16 -o verify-adam-reg.o -I./include
 	nvcc verify_shmem_adam_reg_prefer_L1.cu -Xptxas="-v" -o verify-adam-reg-prefer-L1.o -I./include
-
-
+verify-25d:
+	nvcc verify_25d.cu -Xptxas="-v" -o verify-25d.o -I./include
 # test
 func-pointer:
 	nvcc test_func_pointer.cu -o glmem-func-pointer.o -I./include
