@@ -174,6 +174,7 @@ just like the data reuse in shared version (non-temporal)
 
       // 2
       d_out[C_G] = k_1[C_S - 1] + k_1[C_S + 1] + k_1[C_S - x_s] + k_1[C_S + x_s] + k_0[C_S] + k_2[C_S] - fac * k_1[C_S];
+    }
   } // end for (k)
 }
 
