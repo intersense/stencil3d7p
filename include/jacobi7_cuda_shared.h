@@ -70,7 +70,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
     down  = s_data[CURRENT_S + x_s];
     
     // Perform computation and write to output grid (excluding edge nodes)
-    if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
+    if(ix > 0 && ix < nx-1 && iy > 0 && iy < ny-1)
     {
       temp = right + left + up + down + front + back - curr * fac;
       d_out[CURRENT_G] = temp;
