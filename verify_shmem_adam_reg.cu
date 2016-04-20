@@ -84,7 +84,8 @@ int main(int argc, char* *argv){
 
     dim3 grid((nx+tx-1)/tx, (ny+ty-1)/ty);
     dim3 block(tx, ty);
-
+    printf("grid:(%d, %d)\n", grid.x, grid.y);
+    printf("block:(%d, %d)\n", tx, ty);
     float ms, ms1; // elapsed time in milliseconds
     printf("Start computing...\n");   
 
