@@ -1,7 +1,7 @@
 //jacobi7.cu
 #include <cuda.h>
 #include <stdio.h>
-#include <jacobi7_cuda_shared.h>
+#include <jacobi7_cuda_shared_double.h>
 #include <jacobi7_double.h>
 
 // Convenience function for checking CUDA runtime API results
