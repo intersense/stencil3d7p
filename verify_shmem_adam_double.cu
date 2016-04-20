@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <jacobi7_cuda_shared_double.h>
-#include <jacobi7.h>
+#include <jacobi7_double.h>
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
