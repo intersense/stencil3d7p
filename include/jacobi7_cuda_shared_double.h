@@ -1,4 +1,4 @@
-__global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
+__global__ void jacobi3d_7p_shmem_adam(double * d_in, double * d_out, const int nx, const int ny, const int nz, const double fac)
 {
   const int bx = blockDim.x;
   const int by = blockDim.y;
@@ -13,14 +13,14 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
 
   int CURRENT_G = ix + iy*nx + nx*ny;
   int CURRENT_S = tx + ty*(bx+2);
-  extern __shared__ float s_data[];
+  extern __shared__ double s_data[];
 
-  float curr;
-  float right, left;
-  float up, down;
-  float front, back;
+  double curr;
+  double right, left;
+  double up, down;
+  double front, back;
 
-  float temp;
+  double temp;
 
   // Load current, front, and back nodes into shared and register memory
   back  = d_in[CURRENT_G - nx*ny];
@@ -80,7 +80,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
 
 // compute then store the result to shared memory, after all the data in shared memory updated, store to glmem
 // worse than no store cached in shared memory
-__global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
+__global__ void jacobi3d_7p_shmem_adam_store_shmem(double * d_in, double * d_out, const int nx, const int ny, const int nz, const double fac)
 {
   const int bx = blockDim.x;
   const int by = blockDim.y;
@@ -93,15 +93,15 @@ __global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, 
   int CURRENT_G = ix + iy*nx + nx*ny;
   int CURRENT_S = tx + ty * (bx+2);
 
-  extern __shared__ float s_data[];
+  extern __shared__ double s_data[];
   // the size X-dimension of shared memory
   const int x_s = bx + 2;
-  float curr;
-  float right, left;
-  float up, down;
-  float front, back;
+  double curr;
+  double right, left;
+  double up, down;
+  double front, back;
 
-  float temp;
+  double temp;
 
   // Load current, front, and back nodes into shared and register memory
   back  = d_in[CURRENT_G - nx*ny];
@@ -173,7 +173,7 @@ __global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, 
   }
 }
 // shared memory only store current, west and east in shared memory
-__global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
+__global__ void jacobi3d_7p_shmem_adam_cwe_shmem(double * d_in, double * d_out, const int nx, const int ny, const int nz, const double fac)
 {
   const int bx = blockDim.x;
   //const int by = blockDim.y;
@@ -186,14 +186,14 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
   int CURRENT_G = ix + iy*nx + nx*ny;
   int CURRENT_S = tx; //+ ty*bx;
 
-  extern __shared__ float s_data[];
+  extern __shared__ double s_data[];
 
-  float curr;
-  float right, left;
-  float up, down;
-  float front, back;
+  double curr;
+  double right, left;
+  double up, down;
+  double front, back;
 
-  float temp;
+  double temp;
 
   // Load current, front, and back nodes into shared and register memory
   back  = d_in[CURRENT_G - nx*ny];
@@ -253,7 +253,7 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
 }
 
 
-__global__ void jacobi3d_7p_shmem_adam_reg(float * d_in, float * d_out, const int nx, const int ny, const int nz, const float fac)
+__global__ void jacobi3d_7p_shmem_adam_reg(double * d_in, double * d_out, const int nx, const int ny, const int nz, const double fac)
 {
   const int ix = threadIdx.x + blockIdx.x * blockDim.x;
   const int iy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -262,12 +262,12 @@ __global__ void jacobi3d_7p_shmem_adam_reg(float * d_in, float * d_out, const in
   //__syncthreads();
 
 
-  float curr;
-  float right, left;
-  float up, down;
-  float front, back;
+  double curr;
+  double right, left;
+  double up, down;
+  double front, back;
 
-  float temp;
+  double temp;
 
   if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
   {  
