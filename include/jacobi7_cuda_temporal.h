@@ -44,12 +44,11 @@ __global__ void jacobi3d_7p_25d(float * d_in, float * d_out, const int nx, const
   bool boundary_k = (k >=1 && k <= nz - 2);
 
   // 1 
-  // k_0 and k_2 need no halo
-  // compute k_0 and store in k_0
+  // k_0 needs no halo
+  // loading k_0
+  int C_G_0 = C_G - nx * ny;
+  k_0[C_S] = d_in[C_G_0];
   if (boundary_c){
-    int C_G_0 = C_G - nx * ny;
-    k_0[C_S] = d_in[C_G_0];
-
     // compute k_1 and store in k_1
     k_1[C_S] = d_in[C_G - 1] + d_in[C_G + 1] + d_in[C_G - nx] + d_in[C_G + nx] + d_in[C_G - nx * ny] + d_in[C_G + nx * ny] - fac * d_in[C_G];
 
@@ -138,7 +137,7 @@ just like the data reuse in shared version (non-temporal)
     k_1 = k_2;
     // 1: compute k2 and its halo
     if (boundary_c){
-      int C_G_2 = C_G + nx * ny;
+      C_G_2 = C_G + nx * ny;
       k_2[C_S] = d_in[C_G_2 - 1] + d_in[C_G_2 + 1] + d_in[C_G_2 - nx] + d_in[C_G_2 + nx] + d_in[C_G_2 - nx * ny] + d_in[C_G_2 + nx * ny] - fac * d_in[C_G_2];
       
       // halo of k_2
