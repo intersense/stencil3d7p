@@ -46,7 +46,7 @@ __global__ void jacobi3d_7p_shmem_adam(float * d_in, float * d_out, const int nx
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
   }
-  //#pragma unroll 
+  #pragma unroll 
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
@@ -134,7 +134,7 @@ __global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, 
     __syncthreads();
     d_out[CURRENT_G] = s_data[CURRENT_S];
   }
-  //#pragma unroll 
+  #pragma unroll 
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
@@ -219,7 +219,7 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
   }
-
+  #pragma unroll
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
@@ -285,7 +285,7 @@ __global__ void jacobi3d_7p_shmem_adam_reg(float * d_in, float * d_out, const in
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
   }
-
+  #pragma unroll
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;

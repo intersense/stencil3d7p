@@ -1,7 +1,10 @@
+#include "stencil_math.h"
+#include "cudaDMAv2.h"
 #define PARAM_ALIGNMENT 8 
 #define PARAM_DMA_WARPS 1
 #define PARAM_BYTES_PER_THREAD (12*16) 
 #define PARAM_RADIUS 1
+
 __global__ 
 void jacobi3d7p_dma_single_buffer(const float *src_buffer, float *dst_buffer, const int nx, const int ny, const int nz, const int tx, const int ty)
 {
@@ -9,14 +12,14 @@ void jacobi3d7p_dma_single_buffer(const float *src_buffer, float *dst_buffer, co
     int slice_stride = row_stride * (ty+2);
 
     // Declare our shared memory buffer, base tile + halo region 
-    __shared__ float buffer[(tx+2)*(ty+2)];
+    __shared__ float buffer[3*(tx+2)*(ty+2)];
     CudaDMAStrided<true/*warp specialized*/, PARAM_ALIGNMENT, PARAM_BYTES_PER_THREAD,
-                  (tx+2)*sizeof(float)/*elmt size*/, PARAM_RADIUS, (TILE_Y+2*PARAM_RADIUS)/*num elements*/>
+                  (tx+2)*sizeof(float)/*elmt size*/, PARAM_RADIUS, (ty+2*PARAM_RADIUS)/*num elements*/>
     dma_ld(0/*dmaID*/, (tx*ty)/*num compute threads*/, (tx*ty)/*dma_threadIdx_start*/, 
             row_stride*sizeof(float)/*src stride*/, (tx+2*PARAM_RADIUS)*sizeof(float)/*dst stride*/);
 
     // Offset for this threadblock
-    const unsigned block_offset = blockIdx.x*tx + blockIdx.y*ty*row_stride;
+    const unsigned block_offset = blockIdx.x*(tx+2) + blockIdx.y*(ty+2)*row_stride;
     if (dma_ld.owns_this_thread())
     {
       // DMA warps
