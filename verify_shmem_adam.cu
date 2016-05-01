@@ -49,7 +49,7 @@ int main(int argc, char* *argv){
     float *d_A;
     float *d_B;
     
-    int devId = 0;
+    int devId = 1;
     cudaDeviceProp prop;
     checkCuda( cudaGetDeviceProperties(&prop, devId));
     //printf("Device : %s\n", prop.name);
