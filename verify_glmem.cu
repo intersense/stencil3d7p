@@ -87,7 +87,7 @@ int main(int argc, char* *argv){
     printf("Start computing... \n");   
 
     // Always use device 0
-    checkCuda(cudaSetDevice(1));
+    checkCuda(cudaSetDevice(0));
 
     /* set the ratio of cache/shared memory
     cudaFuncCachePreferNone: Default function cache configuration, no preference

@@ -10,8 +10,41 @@ void jacobi3d7p_dma_single_buffer(const float *src_buffer, float *dst_buffer, co
 {
     int row_stride = tx+2;
     int slice_stride = row_stride * (ty+2);
+    
+    // global coordinates
+    const int gx = threadIdx.x + blockDim.x * blockIdx.x;
+    const int gy = threadIdx.y + blockDim.y * blockIdy.y;
+    const int g = gx + gy * nx;
 
-    // Declare our shared memory buffer, base tile + halo region 
+    // local coordinates
+    const int lx = threadIdx.x + 1;
+    const int ly = threadIdx.y + 1;
+    const int l  = lx + ly*(tx+2) + (tx+2)*(ty+2); // current thread deal with the data is in the middle layer in shared memory array
+    
+    bool isboundary = (gx == 0) || (gx == nx-1) || (gy == 0) || (gy == ny-1);
+    if (!isboundary){// normally 
+
+    }
+    if (gx == 0) { // left boundary
+        if(gy ==0){ // left-top
+
+        }
+        if(gy == ny-1){// left-down
+
+        }
+        // left 
+    }
+    if (gx == nx-1){// right boundary
+        if (gy == 0){ // right top
+
+        }
+        if (gy == ny-1){// right down
+
+        }
+        // right
+    }
+    // Declare our shared memory buffer, base tile + halo region
+
     __shared__ float buffer[3*(tx+2)*(ty+2)];
     CudaDMAStrided<true/*warp specialized*/, PARAM_ALIGNMENT, PARAM_BYTES_PER_THREAD,
                   (tx+2)*sizeof(float)/*elmt size*/, PARAM_RADIUS, (ty+2*PARAM_RADIUS)/*num elements*/>
