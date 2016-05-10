@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <getopt.h>
+#include <stdlib.h>
 #include <cuda.h>
 #include <sys/time.h>
 #include <math.h>
-#include "getopt.h"
-#include <stdlib.h>
+
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
 inline
@@ -23,7 +24,7 @@ __global__ void stride_copy(float *src, float *dst, int len, int stride){
     dst[i] = src[i];
 }
 
-void main()
+int main()
 {
     if(argc != 4) {
         printf("USAGE: %s <len> <stride> <block_x>\n", argv[0]);
@@ -38,10 +39,10 @@ void main()
     const int data_bytes = len * sizeof(float);
 
     float *src_d, *src;
-    float *dst_d, *dst;
+    float *dst_d;
 
     // Allocate host buffers
-    checkCuda(cudaMallocHost((void**)&src, data_bytes); // host pinned
+    checkCuda(cudaMallocHost((void**)&src, data_bytes)); // host pinned
 
     // for comparison btw CPU and GPU version
     checkCuda(cudaMalloc((void**)&src_d, data_bytes));
@@ -68,7 +69,7 @@ void main()
     checkCuda(cudaMemcpy(src_d, src, data_bytes, cudaMemcpyHostToDevice));
 
     checkCuda(cudaEventRecord(start));
-    dim3 grid(size/blockx);
+    dim3 grid(len/blockx);
     dim3 block(blockx);
     stride_copy<<<grid,block>>>(src_d, dst_d,len,stride);
     checkCuda(cudaEventRecord(stop));
@@ -83,4 +84,5 @@ void main()
     cudaFreeHost(src);
     cudaFree(src_d);
     cudaFree(dst_d);
+    return 0;
 }
