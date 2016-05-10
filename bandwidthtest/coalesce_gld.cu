@@ -27,12 +27,13 @@ __global__ void stride_copy(float *src, float *dst, int len, int stride){
 int main(int argc, char* *argv)
 {
     if(argc != 4) {
-        printf("USAGE: %s <len> <stride> <block_x>\n", argv[0]);
+        printf("USAGE: %s <len in MB> <stride> <block_x>\n", argv[0]);
         return 1;
     }
     // program parameters trans
 
     const int len = atoi(argv[1]);
+    len = len << 20;
     const int stride = atoi(argv[2]);
     // blockx: blockDim.x
     const int blockx = atoi(argv[3]);
@@ -62,7 +63,7 @@ int main(int argc, char* *argv)
     checkCuda(cudaEventCreate(&stop));
     float milliseconds = 0;
 
-    printf("Data size:%dMB\n", data_bytes>>20);   
+    printf("Data size:%dMB\n", len);   
     printf("Start testing coalescing... \n");   
 
     // Copy to device
