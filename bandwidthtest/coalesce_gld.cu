@@ -63,7 +63,7 @@ int main(int argc, char* *argv)
     checkCuda(cudaEventCreate(&stop));
     float milliseconds = 0;
 
-    printf("Data size:%dMB\n", len);   
+    printf("Data size:%dM floats\n", len>>20);   
     printf("Start testing coalescing... \n");   
 
     // Copy to device
