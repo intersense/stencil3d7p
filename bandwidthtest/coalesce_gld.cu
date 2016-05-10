@@ -76,8 +76,8 @@ int main(int argc, char* *argv)
     checkCuda(cudaEventSynchronize(stop));
     
     checkCuda(cudaEventElapsedTime(&milliseconds, start, stop));
-    printf("Time:%f\n", milliseconds);
-    float bandwidth = (data_bytes/(10^9))/milliseconds;
+    printf("Time:%fms\n", milliseconds);
+    float bandwidth = (data_bytes>>20)/milliseconds/(10^3);
     printf("Bandwidth:%f MB/s\n", bandwidth);
     checkCuda( cudaEventDestroy(start));
     checkCuda( cudaEventDestroy(stop));
