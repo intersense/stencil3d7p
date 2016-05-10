@@ -19,15 +19,20 @@ cudaError_t checkCuda(cudaError_t result)
   return result;
 }
 
-__global__ void stride_copy(float *src, float *dst, int len, int stride){
+// copy from src to dst
+__global__ void stride_copy0(float *src, float *dst, int len, int stride){
     int i = ((blockDim.x * blockIdx.x + threadIdx.x) * stride) % len;
     dst[i] = src[i];
 }
-
+// increase the values of src
+__global__ void stride_copy1(float *src, float *dst, int len, int stride){
+    int i = ((blockDim.x * blockIdx.x + threadIdx.x) * stride) % len;
+    src[i] = src[i]+1;
+}
 int main(int argc, char* *argv)
 {
-    if(argc != 4) {
-        printf("USAGE: %s <len in MB> <stride> <block_x>\n", argv[0]);
+    if(argc != 5) {
+        printf("USAGE: %s <len in MB> <stride> <block_x> <0 or 1>\n", argv[0]);
         return 1;
     }
     // program parameters trans
@@ -38,16 +43,27 @@ int main(int argc, char* *argv)
     // blockx: blockDim.x
     const int blockx = atoi(argv[3]);
     const int data_bytes = len * sizeof(float);
+    const int choice = atoi(argv[4]);
 
+    void (*kernel)(float *, float *, int, int);
+    
     float *src_d, *src;
     float *dst_d;
 
     // Allocate host buffers
     checkCuda(cudaMallocHost((void**)&src, data_bytes)); // host pinned
 
+
     // for comparison btw CPU and GPU version
-    checkCuda(cudaMalloc((void**)&src_d, data_bytes));
-    checkCuda(cudaMalloc((void**)&dst_d, data_bytes));
+    if(choice == 0){
+        checkCuda(cudaMalloc((void**)&dst_d, data_bytes));
+        checkCuda(cudaMalloc((void**)&src_d, data_bytes));
+        kernel = stride_copy0;
+    }
+    if(choice == 1){
+        checkCuda(cudaMalloc((void**)&src_d, data_bytes));
+        kernel = stride_copy1;
+    }
 
     // randomly generaed test data
     srand(time(NULL));
