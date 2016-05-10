@@ -1,2 +1,2 @@
 coalesce:
-    nvcc coalesce_gld.cu -o oalesce-gld.o 
+	nvcc coalesce_gld.cu -o oalesce-gld.o 
