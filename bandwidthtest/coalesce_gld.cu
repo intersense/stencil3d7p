@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include "getopt.h"
+#include <stdlib.h>
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
 inline
