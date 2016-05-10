@@ -24,7 +24,7 @@ __global__ void stride_copy(float *src, float *dst, int len, int stride){
     dst[i] = src[i];
 }
 
-int main()
+int main(int argc, char* *argv)
 {
     if(argc != 4) {
         printf("USAGE: %s <len> <stride> <block_x>\n", argv[0]);
