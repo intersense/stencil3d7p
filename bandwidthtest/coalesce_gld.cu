@@ -33,7 +33,7 @@ int main(int argc, char* *argv)
     // program parameters trans
 
     const int len = atoi(argv[1]);
-    len = len << 20;
+    len << 20;
     const int stride = atoi(argv[2]);
     // blockx: blockDim.x
     const int blockx = atoi(argv[3]);
