@@ -88,7 +88,7 @@ int main(int argc, char* *argv)
     checkCuda(cudaEventRecord(start));
     dim3 grid(len/blockx);
     dim3 block(blockx);
-    stride_copy<<<grid,block>>>(src_d, dst_d,len,stride);
+    kernel<<<grid,block>>>(src_d, dst_d,len,stride);
     checkCuda(cudaEventRecord(stop));
     checkCuda(cudaEventSynchronize(stop));
     
