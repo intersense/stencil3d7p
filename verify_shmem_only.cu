@@ -190,11 +190,11 @@ int main(int argc, char* *argv){
         diff = cpuResult[i] - gpuResult[i];
         errorNorm += diff * diff;
         refNorm += cpuResult[i] * cpuResult[i];
-        if (abs(diff)> 1e-4)
+        /*if (abs(diff)> 1e-4)
         {
             printf("GPU[%d]=%f\n", i, gpuResult[i]);
             printf("CPU[%d]=%f\n", i, cpuResult[i]);
-        }
+        }*/
 
     }
     errorNorm = sqrt(errorNorm);
