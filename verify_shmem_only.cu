@@ -126,7 +126,7 @@ int main(int argc, char* *argv){
 
     // Run the GPU kernel
     for(int t = 0; t < timesteps; t += 1) {
-        jacobi7_cuda_shared_only<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
+        jacobi3d_7p_shmem_only<<<grid, block, sharedMemSize>>>(input, output, nx, ny, nz, fac);
         tmp = input;
         input =  output;
         output = tmp;
