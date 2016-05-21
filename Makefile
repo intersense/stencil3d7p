@@ -31,6 +31,8 @@ verify-25d:
 func-pointer:
 	nvcc test_func_pointer.cu -o glmem-func-pointer.o -I./include
 
+verify-share-only:
+	nvcc verify_shmem_only.cu -o verify-share-only.o -I./include
 clean:
 	rm *.o 
 
