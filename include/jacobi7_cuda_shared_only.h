@@ -14,29 +14,22 @@ __global__ void jacobi3d_7p_shmem_only(float * d_in, float * d_out, const int nx
   const int xy_s = x_s * y_s;
  
   int CURRENT_G = ix + iy*nx + nx*ny;
-  int CURRENT_S = tx + ty*x_s;
+  int CURRENT_S = tx + ty*x_s + xy_s;
   extern __shared__ float s_data[];
-
-  float curr;
-  float east, west;
-  float north, south;
-  float top, down;
-
-  float temp;
 
   // Load current, top, and down nodes into shared memory
   //down
   s_data[CURRENT_S - xy_s] = d_in[CURRENT_G - nx*ny];
   //curr
-  s_data[CURRENT_S]       = d_in[CURRENT_G];
+  s_data[CURRENT_S]        = d_in[CURRENT_G];
   //top
   s_data[CURRENT_S + xy_s] = d_in[CURRENT_G + nx*ny]; 
 
   // Load halo region into shared memory (curr)
-  if(tx == 1 && ix > 0)       s_data[CURRENT_S - 1]   = d_in[CURRENT_G - 1];
-  if(tx == bx && ix < nx-1)   s_data[CURRENT_S + 1]   = d_in[CURRENT_G + 1];
-  if(ty == 1 && iy > 0)       s_data[CURRENT_S - x_s] = d_in[CURRENT_G - nx];
-  if(ty == by && iy < ny-1)   s_data[CURRENT_S + x_s] = d_in[CURRENT_G + nx];
+  if(tx == 1  && ix > 0)       s_data[CURRENT_S - 1]   = d_in[CURRENT_G - 1];
+  if(tx == bx && ix < nx-1)    s_data[CURRENT_S + 1]   = d_in[CURRENT_G + 1];
+  if(ty == 1  && iy > 0)       s_data[CURRENT_S - x_s] = d_in[CURRENT_G - nx];
+  if(ty == by && iy < ny-1)    s_data[CURRENT_S + x_s] = d_in[CURRENT_G + nx];
   /*
   // Load halo region into shared memory (top)
   if(tx == 1 && ix > 0)       s_data[CURRENT_S  + xy_s - 1]   = d_in[CURRENT_G + nx*ny - 1];
