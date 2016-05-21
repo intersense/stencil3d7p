@@ -46,7 +46,7 @@ __global__ void jacobi3d_7p_shmem_only(float * d_in, float * d_out, const int nx
 
   if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
   {
-    d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] + s_data[CURRENT_S-x_s] + s_data[CURRENT_S+x_s] + s_data[CURRENT_S-xy_s] + s_data[CURRENT_S+xy_s] + fac * s_data[CURRENT_S];
+    d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] + s_data[CURRENT_S-x_s] + s_data[CURRENT_S+x_s] + s_data[CURRENT_S-xy_s] + s_data[CURRENT_S+xy_s] - fac * s_data[CURRENT_S];
   }
   #pragma unroll 
   for(int k=1; k<nz-2; k++)
@@ -75,7 +75,7 @@ __global__ void jacobi3d_7p_shmem_only(float * d_in, float * d_out, const int nx
     // Perform computation and write to output grid (excluding edge nodes)
     if(ix > 0 && ix < nx-1 && iy > 0 && iy < ny-1)
     {
-      d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] + s_data[CURRENT_S-x_s] + s_data[CURRENT_S+x_s] + s_data[CURRENT_S-xy_s] + s_data[CURRENT_S+xy_s] + fac * s_data[CURRENT_S];
+      d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] + s_data[CURRENT_S-x_s] + s_data[CURRENT_S+x_s] + s_data[CURRENT_S-xy_s] + s_data[CURRENT_S+xy_s] - fac * s_data[CURRENT_S];
     }
   }
 }
