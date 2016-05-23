@@ -111,7 +111,7 @@ int main(int argc, char* *argv){
     if (reg_or_shared == 0)//reg
         glmem2reg<<<grid, block>>>(h_A, nx);
     if (reg_or_shared == 1)//shmem
-        glmem2shmem<<<grid, block, NUM*sizeof(float)>>>(h_A, nx);
+        glmem2shmem<<<grid, block, tx>>>(h_A, nx);
 
     
 
