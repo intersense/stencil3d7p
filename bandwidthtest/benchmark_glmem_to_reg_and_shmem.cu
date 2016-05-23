@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <math.h>
 
-#define REGNUM 200
+#define NUM 200
 
 __global__ void glmem2reg(float * in, const int num)
 {
     int x = threadIdx.x + blockDim.x * blockIdx.x;
     int x_s = threadIdx.x;
-    float a[REGNUM];
+    float a[NUM];
     if(x < num){
         a[x_s] = in[x];  
         a[x_s] = a[x_s] + 1.0;
@@ -19,6 +19,15 @@ __global__ void glmem2reg(float * in, const int num)
 
 __global__ void glmem2shmem(float * in, const int num)
 {
+    extern __shared__ a[NUM];
+    int x = threadIdx.x + blockDim.x * blockIdx.x;
+    int x_s = threadIdx.x;
+    float a[NUM];
+    if(x < num){
+        a[x_s] = in[x];  
+        a[x_s] = a[x_s] + 1.0;
+        in[x] = a[x_s];       
+    }
 
 }
 
@@ -42,8 +51,8 @@ cudaError_t checkCuda(cudaError_t result)
 }
 
 int main(int argc, char* *argv){
-    if(argc != 3) {
-        printf("USAGE: %s <NX>K <TX>\n", argv[0]);
+    if(argc != 4) {
+        printf("USAGE: %s <NX>K <TX> <reg_0_shared_1>\n", argv[0]);
         return 1;
     }
     // program parameters trans
@@ -51,7 +60,13 @@ int main(int argc, char* *argv){
     // 0: no; 1: yes
     const int nx = atoi(argv[1])<<10;
     const int tx = atoi(argv[2]);
+    const int reg_or_shared = atoi(argv[3]);
 
+    /*void (*kernel)(float *, int);
+    if (reg_or_shared == 0)
+        kernel = glmem2reg;
+    else kernel = glmem2shmem;
+    */
     const int bytes = nx * sizeof(float); 
 
     float *h_A, *d_A;
@@ -93,7 +108,14 @@ int main(int argc, char* *argv){
     checkCuda(cudaMalloc((void**)&d_A, bytes)); // device
     // copy data to device
     checkCuda(cudaMemcpy(d_A, h_A, bytes, cudaMemcpyHostToDevice));
-    glmem2reg<<<grid, block>>>(h_A, nx);
+
+    if (reg_or_shared == 0)//reg
+        glmem2reg<<<grid, block>>>(h_A, nx);
+    if (reg_or_shared == 1)//shmem
+        glmem2shmem<<<grid, block, NUM*sizeof(float)>>>(h_A, nx);
+
+    
+
     // timing end pure gpu computing
     checkCuda(cudaEventRecord(stopEvent1, 0));
     checkCuda(cudaEventSynchronize(stopEvent1));
