@@ -97,7 +97,7 @@ int main(int argc, char* *argv){
     // timing end pure gpu computing
     checkCuda(cudaEventRecord(stopEvent1, 0));
     checkCuda(cudaEventSynchronize(stopEvent1));
-    checkCuda(cudaEventElapsedTime(&ms1, startEvent1, stopEvent1));
+    checkCuda(cudaEventElapsedTime(&ms1, startEvent, stopEvent1));
     printf("Time of register version (pure GPU) (ms): %f\n", ms1);
 
     checkCuda( cudaMemcpy(h_A, d_A, bytes, cudaMemcpyDeviceToHost));
