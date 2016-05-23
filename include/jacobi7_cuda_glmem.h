@@ -65,7 +65,7 @@ __global__ void jacobi3d_7p_glmem_col(float *input, float *output, const int nx,
   float c_d, e_d, w_d, n_d, s_d, t_d, b_d;
   int isboundary = (tx_b == 0 || tx_b == nx-1 || ty_b == 0 || ty_b == ny-1) ? 1 : 0;
   if (!isboundary){
-  #pragma unroll 
+  //#pragma unroll 
     for (; k < nz - 1; k++){    
       c_g = ty_b + tx_b * ny + k * xy;
       c_d = input[c_g];
@@ -99,7 +99,7 @@ __global__ void jacobi3d_7p_glmem_col_row(float *input, float *output, const int
   float c_d, e_d, w_d, n_d, s_d, t_d, b_d;
   int isboundary = (tx_b == 0 || tx_b == nx-1 || ty_b == 0 || ty_b == ny-1) ? 1 : 0;
   if (!isboundary){
-  #pragma unroll 
+  //#pragma unroll 
     for (; k < nz - 1; k++){    
       c_g = ty_b + tx_b * ny + k * xy;
       c_g_cr = tx_b + ty_b * nx + k * xy;

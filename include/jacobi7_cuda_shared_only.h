@@ -49,7 +49,7 @@ __global__ void jacobi3d_7p_shmem_only(float * d_in, float * d_out, const int nx
   {
     d_out[CURRENT_G] = s_data[CURRENT_S+1] + s_data[CURRENT_S-1] + s_data[CURRENT_S-x_s] + s_data[CURRENT_S+x_s] + s_data[CURRENT_S-xy_s] + s_data[CURRENT_S+xy_s] - fac * s_data[CURRENT_S];
   }
-  #pragma unroll 
+  //#pragma unroll 
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
