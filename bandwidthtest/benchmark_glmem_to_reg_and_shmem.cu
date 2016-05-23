@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define NUM 20
+#define NUM 40
 
 __global__ void glmem2reg(float * in, const int num)
 {
