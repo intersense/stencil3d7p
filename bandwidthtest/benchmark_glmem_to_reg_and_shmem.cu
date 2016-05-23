@@ -2,10 +2,19 @@
 #include <stdio.h>
 #include <math.h>
 
+#define REGNUM 200
+
 __global__ glmem2reg(float * in, const int num)
 {
-    int x = threadIdx.x;
-
+    int x = threadIdx.x + blockDim.x * blockIdx.x;
+    int x_s = threadIdx.x;
+    float a[REGNUM];
+    if(x < num){
+        a[x_s] = in[x];  
+        a[x_s] = a[x_s] + 1.0;
+        in[x] = a[x_s];       
+    }
+ 
 }
 
 __global__ glmem2shmem(float * in, const int num)
@@ -34,18 +43,18 @@ cudaError_t checkCuda(cudaError_t result)
 
 int main(int argc, char* *argv){
     if(argc != 3) {
-        printf("USAGE: %s <NX> <TX>\n", argv[0]);
+        printf("USAGE: %s <NX>K <TX>\n", argv[0]);
         return 1;
     }
     // program parameters trans
     // st_cached is for whether the computed results cached in shared memory
     // 0: no; 1: yes
-    const int nx = atoi(argv[1]);
+    const int nx = atoi(argv[1])<<10;
     const int tx = atoi(argv[2]);
 
     const int bytes = nx * sizeof(float); 
 
-    float *h_A;
+    float *h_A, *d_A;
 
     int devId = 0;
     cudaDeviceProp prop;
@@ -54,8 +63,7 @@ int main(int argc, char* *argv){
     checkCuda( cudaSetDevice(devId));
     
     // Allocate host buffers
-    checkCuda(cudaMallocHost((void**)&h_A, xyz_bytes)); // host pinned
-    checkCuda(cudaMallocHost((void**)&h_B, xyz_bytes));
+    checkCuda(cudaMallocHost((void**)&h_A, bytes)); // host pinned
 
     // grid data iniatialization   
     // randomly generaed test data
@@ -69,5 +77,44 @@ int main(int argc, char* *argv){
 
     printf("grid:(%d, %d)\n", grid.x, grid.y);
     printf("block:(%d, %d)\n", tx, ty);
+    float ms, ms1; // elapsed time in milliseconds
+    // create events and streams
+    cudaEvent_t startEvent, stopEvent, startEvent1, stopEvent1;
+    
+    checkCuda(cudaEventCreate(&startEvent));
+    checkCuda(cudaEventCreate(&stopEvent));
+    checkCuda(cudaEventCreate(&startEvent1));
+    checkCuda(cudaEventCreate(&stopEvent1));
 
+    // timing start include data transfer and memory allocation
+    checkCuda(cudaEventRecord(startEvent,0));
+    
+    // Allocate device buffers
+    checkCuda(cudaMalloc((void**)&d_A, bytes)); // device
+    // copy data to device
+    checkCuda(cudaMemcpy(d_A, h_A, bytes, cudaMemcpyHostToDevice));
+    glmem2reg<<<grid, block>>>(h_A, nx);
+    // timing end pure gpu computing
+    checkCuda(cudaEventRecord(stopEvent1, 0));
+    checkCuda(cudaEventSynchronize(stopEvent1));
+    checkCuda(cudaEventElapsedTime(&ms1, startEvent1, stopEvent1));
+    printf("Time of register version (pure GPU) (ms): %f\n", ms1);
+
+    checkCuda( cudaMemcpy(h_A, d_A, bytes, cudaMemcpyDeviceToHost));
+
+    checkCuda( cudaEventRecord(stopEvent, 0));
+    checkCuda( cudaEventSynchronize(stopEvent));
+    checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
+    printf("Time of register version (ms): %f\n", ms);
+    printf("(including data transfer and memory allocation in GPU.)\n");
+
+    // cleanup
+    checkCuda( cudaEventDestroy(startEvent));
+    checkCuda( cudaEventDestroy(stopEvent));
+    checkCuda( cudaEventDestroy(startEvent1));
+    checkCuda( cudaEventDestroy(stopEvent1));
+    cudaFreeHost(h_A);
+    cudaFree(d_A);
+    
+    return 0;
 }
