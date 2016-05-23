@@ -76,7 +76,7 @@ int main(int argc, char* *argv){
     dim3 block(tx, 1);
 
     printf("grid:(%d, %d)\n", grid.x, grid.y);
-    printf("block:(%d, %d)\n", tx, ty);
+    printf("block:(%d, %d)\n", block.x, block.y);
     float ms, ms1; // elapsed time in milliseconds
     // create events and streams
     cudaEvent_t startEvent, stopEvent, startEvent1, stopEvent1;
