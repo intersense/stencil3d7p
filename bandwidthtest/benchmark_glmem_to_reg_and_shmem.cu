@@ -19,10 +19,9 @@ __global__ void glmem2reg(float * in, const int num)
 
 __global__ void glmem2shmem(float * in, const int num)
 {
-    extern __shared__ a[NUM];
+    extern __shared__ float a[NUM];
     int x = threadIdx.x + blockDim.x * blockIdx.x;
     int x_s = threadIdx.x;
-    float a[NUM];
     if(x < num){
         a[x_s] = in[x];  
         a[x_s] = a[x_s] + 1.0;
