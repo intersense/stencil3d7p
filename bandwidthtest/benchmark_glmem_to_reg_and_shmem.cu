@@ -119,14 +119,14 @@ int main(int argc, char* *argv){
     checkCuda(cudaEventRecord(stopEvent1, 0));
     checkCuda(cudaEventSynchronize(stopEvent1));
     checkCuda(cudaEventElapsedTime(&ms1, startEvent, stopEvent1));
-    printf("Time of register version (pure GPU) (ms): %f\n", ms1);
+    printf("Time (pure GPU) (ms): %f\n", ms1);
 
     checkCuda( cudaMemcpy(h_A, d_A, bytes, cudaMemcpyDeviceToHost));
 
     checkCuda( cudaEventRecord(stopEvent, 0));
     checkCuda( cudaEventSynchronize(stopEvent));
     checkCuda( cudaEventElapsedTime(&ms, startEvent, stopEvent));
-    printf("Time of register version (ms): %f\n", ms);
+    printf("Time (ms): %f\n", ms);
     printf("(including data transfer and memory allocation in GPU.)\n");
 
     // cleanup
