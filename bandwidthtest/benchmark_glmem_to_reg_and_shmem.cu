@@ -4,7 +4,7 @@
 
 #define REGNUM 200
 
-__global__ glmem2reg(float * in, const int num)
+__global__ void glmem2reg(float * in, const int num)
 {
     int x = threadIdx.x + blockDim.x * blockIdx.x;
     int x_s = threadIdx.x;
@@ -17,12 +17,12 @@ __global__ glmem2reg(float * in, const int num)
  
 }
 
-__global__ glmem2shmem(float * in, const int num)
+__global__ void glmem2shmem(float * in, const int num)
 {
 
 }
 
-__global__ glmem2shmem_reg(float * in, const int num)
+__global__ void glmem2shmem_reg(float * in, const int num)
 {
 
 }
@@ -115,6 +115,6 @@ int main(int argc, char* *argv){
     checkCuda( cudaEventDestroy(stopEvent1));
     cudaFreeHost(h_A);
     cudaFree(d_A);
-    
+
     return 0;
 }
