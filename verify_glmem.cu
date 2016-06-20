@@ -3,11 +3,20 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <math.h>
-#include "getopt.h"
 #include "jacobi7_cuda_glmem.h"
 #include "jacobi7.h"
+
+#ifdef __GNUC__
+#include <getopt.h>
+#include <sys/time.h>
+// Timer function
+double rtclock(){
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  return (tp.tv_sec + tp.tv_usec*1.0e-6);
+}
+#endif
 
 // Convenience function for checking CUDA runtime API results
 // can be wrapped around any runtime API call. No-op in release builds.
@@ -23,12 +32,6 @@ cudaError_t checkCuda(cudaError_t result)
   return result;
 }
 
-// Timer function
-double rtclock(){
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  return (tp.tv_sec + tp.tv_usec*1.0e-6);
-}
 
 int main(int argc, char* *argv){
     if(argc != 8) {
@@ -160,8 +163,7 @@ int main(int argc, char* *argv){
     float *gpuResult = h_dB;
     
 
-    // Run the CPU version
-    //float startTime = rtclock();
+
     float *tmp1;
     for(int t = 0; t < timesteps; t += 1) {
         jacobi7(nx, ny, nz, h_dA1, h_dB1, fac);
@@ -170,14 +172,6 @@ int main(int argc, char* *argv){
         h_dB1 = tmp1;
     }
     float *cpuResult = h_dA1;
-    /*float endTime = rtclock();
-    double elapsedTimeC = endTime - startTime;
-
-    printf("Elapsed Time:%lf\n", elapsedTimeC);
-    flops = xyz * 7.0 * timesteps;
-    gflops = flops / elapsedTimeC / 1e9;
-    printf("(CPU) %lf GFlop/s\n", gflops);
-    */
 
     // compare the results btw CPU and GPU version
     double errorNorm, refNorm, diff;

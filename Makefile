@@ -33,8 +33,24 @@ func-pointer:
 
 verify-share-only:
 	nvcc verify_shmem_only.cu -o verify-share-only.o -I./include
+
+#############################################################################################################
+# for windows
+verify-glmem-win:
+	nvcc verify_glmem.cu -o verify-glmem.exe -I./include
+verify-adam-win:
+	nvcc verify_shmem_adam.cu -Xptxas="-v" -o verify-adam.exe -I./include
+verify-adam-reg-win:
+	nvcc verify_shmem_adam_reg.cu -Xptxas="-v" -o verify-adam-reg.exe -I./include
+verify-share-only-win:
+	nvcc verify_shmem_only.cu -o verify-share-only.exe -I./include
+
+
 clean:
-	rm *.o 
+	rm *.o *.exe *.lib *.exp
+
+
+
 
 
 # useless

@@ -134,7 +134,7 @@ __global__ void jacobi3d_7p_shmem_adam_store_shmem(float * d_in, float * d_out, 
     __syncthreads();
     d_out[CURRENT_G] = s_data[CURRENT_S];
   }
-  //#pragma unroll 
+  #pragma unroll 
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
@@ -219,7 +219,7 @@ __global__ void jacobi3d_7p_shmem_adam_cwe_shmem(float * d_in, float * d_out, co
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
   }
-  //#pragma unroll
+  #pragma unroll
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
@@ -268,8 +268,9 @@ __global__ void jacobi3d_7p_shmem_adam_reg(float * d_in, float * d_out, const in
   float front, back;
 
   float temp;
-
-  if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
+  int isboundary = (ix == 0 || ix == nx-1 ||iy == 0 || iy == ny-1) ? 1 : 0;
+  //if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
+  if (!isboundary)
   {  
 
     // Load current, front, and back nodes into shared and register memory
@@ -285,29 +286,29 @@ __global__ void jacobi3d_7p_shmem_adam_reg(float * d_in, float * d_out, const in
     temp = right + left + up + down + front + back - curr * fac;
     d_out[CURRENT_G] = temp;
   }
-  //#pragma unroll
+  #pragma unroll
   for(int k=1; k<nz-2; k++)
   {
     CURRENT_G += nx*ny;
 
     //__syncthreads();
     // Perform computation and write to output grid (excluding edge nodes)
-    if(ix > 0 && ix < nx-1 & iy > 0 && iy < ny-1)
+    if(!isboundary)
     {
       // Re-use data already in registers to move forward
       back  = curr;
       curr  = front;
       front = d_in[CURRENT_G + nx*ny];
-      //__syncthreads();
+
       // Load halo region into register
-      /*if(tx == 1 && ix > 0)*/       left = d_in[CURRENT_G - 1];
-      /*if(tx == bx-2 && ix < nx-1)*/ right = d_in[CURRENT_G + 1];
-      /*if(ty == 1 && iy > 0)*/       up    = d_in[CURRENT_G - nx];
-      /*if(ty == by-2 && iy < ny-1)*/ down  = d_in[CURRENT_G + nx];
-      //__syncthreads();
+      left = d_in[CURRENT_G - 1];
+      right = d_in[CURRENT_G + 1];
+      up    = d_in[CURRENT_G - nx];
+      down  = d_in[CURRENT_G + nx];
+
       temp = right + left + up + down + front + back - curr * fac;
       d_out[CURRENT_G] = temp;
     }
-    //__syncthreads();
+
   }
 }
